@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7fb">
+  <meta name="description" content="A personal expense and planning dashboard.">
+  <title>Ledgerly — Expense tracker</title>
+  <link rel="manifest" href="./manifest.json">
+  <style>
+    :root{color-scheme:light;--bg:#f6f7fb;--surface:#fff;--surface-2:#f8f9fc;--text:#202331;--muted:#85899a;--line:#eceef3;--primary:#6658d3;--primary-soft:#f0efff;--green:#24966c;--green-soft:#e8f7f0;--red:#df626b;--red-soft:#fff0f0;--shadow:0 12px 35px rgba(32,35,49,.055);--radius:18px}
+    [data-theme="dark"]{color-scheme:dark;--bg:#171821;--surface:#20212c;--surface-2:#292a36;--text:#f1f1f7;--muted:#a1a2b1;--line:#353643;--primary:#9a8cff;--primary-soft:#302d49;--green:#55c79a;--green-soft:#223a32;--red:#ff818a;--red-soft:#40292d;--shadow:0 12px 35px rgba(0,0,0,.18)}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;font-size:14px;min-height:100vh;transition:background .2s,color .2s}button,input,select,textarea{font:inherit}button{cursor:pointer}h1,h2,h3,p{margin:0}h1,h2,h3,.brand{font-family:Arial,Helvetica,sans-serif}.hidden{display:none!important}.muted{color:var(--muted)}.eyebrow{text-transform:uppercase;letter-spacing:.11em;font-size:10px;font-weight:700;color:var(--muted)}.subtle{font-size:12px;color:var(--muted)}
+    .brand-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:var(--primary);color:white;font-size:17px;font-weight:800}
+    .app-shell{max-width:1510px;margin:auto;padding:0 34px 40px}.topbar{height:82px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);margin-bottom:28px}.brand{font-size:20px;font-weight:800;letter-spacing:-.7px;display:flex;gap:10px;align-items:center}.top-actions{display:flex;align-items:center;gap:12px}.icon-btn,.small-btn{border:1px solid var(--line);color:var(--text);background:var(--surface);height:38px;min-width:38px;padding:0 11px;border-radius:11px}.icon-btn{font-size:16px}.language-control{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:15px}.language-select{height:38px;max-width:155px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--text);padding:0 9px;font-size:12px}.main-heading{display:flex;justify-content:space-between;align-items:end;margin-bottom:24px}.main-heading h1{font-size:27px;letter-spacing:-1px;margin:5px 0}.date-label{color:var(--muted);font-size:12px}.connection{font-size:11px;display:flex;align-items:center;gap:6px;color:var(--muted);margin-top:5px}.dot{width:7px;height:7px;border-radius:100%;background:#41b883}
+    .summary-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:15px;margin-bottom:25px}.summary-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:19px 20px;box-shadow:var(--shadow)}.balance-card{background:linear-gradient(130deg,#6658d3,#8979e9);color:white;border:0;position:relative;overflow:hidden}.balance-card:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:#ffffff12;right:-30px;top:-75px}.summary-title{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:13px}.balance-card .summary-title{color:#e1dcff}.summary-value{font-family:Manrope,sans-serif;font-weight:800;letter-spacing:-.8px;font-size:27px}.balance-card .summary-value{font-size:31px}.summary-meta{font-size:11px;color:var(--muted);margin-top:7px}.balance-card .summary-meta{color:#e1dcff}.summary-icon{float:right;width:30px;height:30px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center}
+    .dashboard-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start}.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);min-width:0}.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.panel-heading h2{font-size:17px;letter-spacing:-.4px}.panel-heading p{margin-top:4px}.primary-btn{border:0;background:var(--primary);color:white;border-radius:10px;padding:10px 14px;font-weight:700;font-size:12px;box-shadow:0 5px 12px #6658d322}.primary-btn:hover{filter:brightness(1.07);transform:translateY(-1px)}.text-btn{background:transparent;color:var(--primary);border:0;font-size:12px;font-weight:700;padding:8px}.segmented{display:flex;padding:3px;background:var(--surface-2);border-radius:10px;gap:3px}.segmented button{border:0;background:transparent;color:var(--muted);padding:7px 10px;border-radius:8px;font-size:11px}.segmented button.active{background:var(--surface);color:var(--text);box-shadow:0 2px 6px #0000000c}
+    .planning-total{padding:14px 15px;border-radius:12px;background:var(--primary-soft);display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.planning-total strong{font-family:Manrope,sans-serif;font-size:17px;color:var(--primary)}.filter-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.filter-row select,.filter-row input{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:9px;padding:8px 10px;font-size:11px;min-width:0}.card-list{display:grid;gap:10px}.planning-card{padding:14px;border:1px solid var(--line);border-left:3px solid var(--cat-color,var(--primary));border-radius:12px;background:var(--surface);position:relative}.item-top{display:flex;align-items:flex-start;gap:10px}.category-icon{width:34px;height:34px;flex:none;border-radius:11px;background:color-mix(in srgb,var(--cat-color,var(--primary)) 13%,transparent);display:grid;place-items:center;font-size:16px}.item-main{min-width:0;flex:1}.item-title{font-weight:700;font-size:13px;overflow-wrap:anywhere}.item-sub{font-size:10px;color:var(--muted);margin-top:4px}.item-amount{font-weight:700;font-size:13px;white-space:nowrap}.item-note{font-size:11px;color:var(--muted);margin:10px 0 0 44px;line-height:1.45;overflow-wrap:anywhere}.item-actions{display:flex;gap:3px;margin-left:auto}.item-actions button{background:transparent;border:0;color:var(--muted);padding:3px 5px;font-size:12px}.item-actions button:hover{color:var(--primary)}.expense-row{padding:12px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:11px;cursor:pointer}.expense-row:last-child{border-bottom:0}.expense-row .item-sub{margin-top:4px}.expense-row:hover .item-title{color:var(--primary)}.expense-amount{margin-left:auto;text-align:right;font-weight:700;white-space:nowrap}.expense-amount small{display:block;color:var(--muted);font-weight:400;font-size:10px;margin-top:3px}.empty-state{text-align:center;border:1px dashed var(--line);padding:27px 15px;border-radius:12px;color:var(--muted);font-size:12px}.empty-state span{display:block;font-size:24px;margin-bottom:8px}
+    .below-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}.comparison-row{display:grid;grid-template-columns:minmax(88px,1fr) 2fr 95px;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.comparison-row>*{min-width:0}.comparison-row:last-child{border-bottom:0}.compare-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.progress{height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden}.progress span{height:100%;display:block;border-radius:99px;background:var(--green)}.progress span.over{background:var(--red)}.compare-number{text-align:right;font-size:10px;color:var(--muted)}.compare-number strong{color:var(--text);display:block;font-size:11px;margin-bottom:3px}.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}.chart-wrap{height:240px;position:relative}.chart-panel .panel-heading{margin-bottom:8px}
+    .page-view{margin-top:20px}.page-view>.panel{margin-bottom:18px}.history-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.history-card{border:1px solid var(--line);border-radius:12px;padding:14px}.history-card h3{font-size:12px;margin-bottom:9px}.history-count{color:var(--muted);font-size:11px}.toast{position:fixed;right:22px;bottom:22px;background:#242531;color:#fff;padding:12px 16px;border-radius:11px;box-shadow:var(--shadow);z-index:20;font-size:12px;animation:pop .2s ease}.toast.error{background:#b8434c}@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-backdrop{position:fixed;inset:0;background:#17182188;display:grid;place-items:center;padding:18px;z-index:30}.modal{width:min(530px,100%);max-height:90vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 24px 80px #0003}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h2{font-size:18px}.close-btn{border:0;background:var(--surface-2);color:var(--muted);height:31px;width:31px;border-radius:9px;font-size:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:11px;color:var(--muted);font-weight:600}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);padding:10px 11px;outline:none}.field textarea{min-height:74px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 12%,transparent)}.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:19px}.cancel-btn{background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:12px}.detail-amount{font:800 30px Manrope,sans-serif;margin:12px 0}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}.detail-cell{padding:12px;background:var(--surface-2);border-radius:11px}.detail-cell span{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}.detail-cell strong{font-size:12px}.bottom-nav{display:none}.page-hidden{display:none!important}
+    @media(max-width:1050px){.app-shell{padding:0 22px 35px}.summary-grid{grid-template-columns:repeat(2,1fr)}.dashboard-grid{grid-template-columns:1fr 1fr}}
+    .chart-wrap svg{display:block;width:100%;height:100%;overflow:visible}.chart-label{fill:var(--muted);font:10px Arial,Helvetica,sans-serif}.chart-grid{stroke:var(--line);stroke-width:1}
+    .chart-legend{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 12px;padding:2px 6px;font-size:10px;color:var(--muted)}.chart-legend-item{display:inline-flex;align-items:center;gap:5px}.chart-legend-item i{width:8px;height:8px;border-radius:50%;display:inline-block}
+    @media(max-width:760px){.app-shell{padding:0 15px 90px}.topbar{height:67px;margin-bottom:22px}.desktop-nav{display:none}.top-actions{gap:7px}.language-select{max-width:112px;padding:0 6px;font-size:11px}.main-heading{align-items:flex-start}.main-heading h1{font-size:23px}.summary-grid{gap:9px;margin-bottom:16px}.summary-card{padding:14px}.summary-value{font-size:21px}.balance-card .summary-value{font-size:25px}.summary-title{font-size:10px;margin-bottom:9px}.dashboard-grid{grid-template-columns:1fr;gap:14px}.panel{padding:17px}.below-grid,.charts-grid{grid-template-columns:1fr;gap:14px;margin-top:14px}.chart-wrap{height:220px}.comparison-row{grid-template-columns:minmax(75px,1fr) 1.5fr 85px;gap:8px}.history-grid{grid-template-columns:1fr 1fr}.bottom-nav{position:fixed;z-index:10;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border-top:1px solid var(--line);padding:7px 10px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -4px 16px #0000000a}.bottom-nav button{background:transparent;border:0;color:var(--muted);font-size:10px;padding:5px}.bottom-nav button span{display:block;font-size:18px;margin-bottom:2px}.bottom-nav button.active{color:var(--primary);font-weight:700}}
+    @keyframes dashboard-enter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes list-enter{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes list-exit{to{opacity:0;transform:translateX(14px) scale(.98)}}
+    @keyframes modal-backdrop-in{from{opacity:0}to{opacity:1}}
+    @keyframes modal-backdrop-out{to{opacity:0}}
+    @keyframes modal-enter{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes modal-exit{to{opacity:0;transform:translateY(10px) scale(.98)}}
+    @keyframes ripple-wave{to{transform:scale(1);opacity:0}}
+    @keyframes content-switch{from{opacity:.35;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes nav-bounce{0%,100%{transform:scale(1)}45%{transform:scale(1.24) translateY(-2px)}70%{transform:scale(.94)}}
+    @keyframes pie-draw{from{stroke-dashoffset:0;opacity:.35}to{stroke-dashoffset:var(--target-offset);opacity:1}}
+    @keyframes bar-grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+    @keyframes bar-slide{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+    @keyframes line-draw{to{stroke-dashoffset:0}}
+    .summary-card,.dashboard-grid>.panel,.below-grid>.panel,.charts-grid>.panel{opacity:0;animation:dashboard-enter .48s cubic-bezier(.2,.7,.25,1) both}
+    .summary-grid>.summary-card:nth-child(1){animation-delay:.04s}.summary-grid>.summary-card:nth-child(2){animation-delay:.11s}.summary-grid>.summary-card:nth-child(3){animation-delay:.18s}.summary-grid>.summary-card:nth-child(4){animation-delay:.25s}
+    .dashboard-grid>.panel:nth-child(1){animation-delay:.3s}.dashboard-grid>.panel:nth-child(2){animation-delay:.36s}.below-grid>.panel:nth-child(1){animation-delay:.42s}.below-grid>.panel:nth-child(2){animation-delay:.48s}
+    .charts-grid>.panel:nth-child(1){animation-delay:.54s}.charts-grid>.panel:nth-child(2){animation-delay:.6s}.charts-grid>.panel:nth-child(3){animation-delay:.66s}.charts-grid>.panel:nth-child(4){animation-delay:.72s}
+    .summary-card,.planning-card,.expense-row,.history-card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background-color .2s ease}
+    .summary-card:hover,.planning-card:hover,.history-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(32,35,49,.11)}
+    .balance-card:hover{box-shadow:0 16px 34px rgba(67,52,157,.25)}
+    .planning-card:hover,.history-card:hover{border-color:color-mix(in srgb,var(--primary) 30%,var(--line))}
+    .expense-row:hover{transform:translateY(-2px);background:var(--surface-2);border-radius:10px;padding-left:9px;padding-right:9px}
+    .primary-btn,.text-btn,.small-btn,.icon-btn,.item-actions button,.segmented button,.bottom-nav button,.cancel-btn,.close-btn{transition:transform .16s ease,filter .16s ease,background-color .16s ease,color .16s ease,box-shadow .16s ease}
+    button:active{transform:scale(.96)}
+    .primary-btn:active,.cancel-btn:active,.close-btn:active{transform:scale(.96)}
+    button.has-ripple{position:relative;isolation:isolate;overflow:hidden}
+    .ripple-wave{position:absolute;z-index:0;display:block;margin:0!important;padding:0;border:0;border-radius:50%;background:currentColor;opacity:.18;font-size:0!important;pointer-events:none;animation:ripple-wave .5s ease-out forwards}
+    .list-enter{animation:list-enter .38s cubic-bezier(.2,.7,.25,1) both}
+    .is-removing{pointer-events:none;animation:list-exit .22s ease-in both!important}
+    .view-switching{animation:content-switch .24s ease both}
+    .modal-backdrop{animation:modal-backdrop-in .2s ease both}
+    .modal-backdrop .modal{animation:modal-enter .24s cubic-bezier(.2,.7,.25,1) both}
+    .modal-backdrop.is-closing{pointer-events:none;animation:modal-backdrop-out .18s ease both}
+    .modal-backdrop.is-closing .modal{animation:modal-exit .18s ease both}
+    .progress span{width:0;transition:width .65s cubic-bezier(.2,.7,.25,1)}
+    .chart-segment{animation:pie-draw .8s cubic-bezier(.2,.7,.25,1) both}
+    .chart-bar-vertical{transform-box:fill-box;transform-origin:center bottom;animation:bar-grow .55s cubic-bezier(.2,.7,.25,1) both;animation-delay:var(--bar-delay,0s)}
+    .chart-bar-horizontal{transform-box:fill-box;transform-origin:left center;animation:bar-slide .55s cubic-bezier(.2,.7,.25,1) both;animation-delay:var(--bar-delay,0s)}
+    .chart-line{stroke-dasharray:1000;stroke-dashoffset:1000;animation:line-draw 1s ease-out .12s forwards}
+    .chart-area{opacity:0;animation:chart-area-in .6s ease .18s forwards}
+    @keyframes chart-area-in{to{opacity:.1}}
+    .bottom-nav button.active span:first-child{animation:nav-bounce .38s ease-out}
+    .page-view-enter{animation:content-switch .26s ease both}
+    .save-status{display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:86px;text-align:right;line-height:1.1}
+    #saveStatusText{font-size:11px;font-weight:700;color:var(--green);white-space:nowrap}
+    .save-status[data-state="saving"] #saveStatusText{color:var(--muted)}
+    .save-status[data-state="partial"] #saveStatusText,.save-status[data-state="error"] #saveStatusText{color:var(--red)}
+    .last-saved{font-size:9px;color:var(--muted);white-space:nowrap}
+    .backup-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+    .backup-actions .text-btn,.backup-actions .small-btn{font-size:11px;white-space:nowrap}
+    .storage-loading #app,.storage-loading #bottomNav{pointer-events:none}
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+      .summary-card,.dashboard-grid>.panel,.below-grid>.panel,.charts-grid>.panel{opacity:1}
+    }
+    @media(max-width:760px){
+      .topbar{gap:7px}
+      .brand{gap:7px;font-size:17px}
+      .brand-mark{width:30px;height:30px}
+      .top-actions{gap:4px}
+      .save-status{min-width:0;width:88px}
+      .last-saved{font-size:8px;white-space:normal}
+      .language-select{max-width:75px;padding:0 4px;font-size:10px}
+      .language-control{gap:4px;font-size:13px}
+      .main-heading{flex-wrap:wrap;gap:8px}
+      .backup-actions{width:100%;justify-content:flex-start}
+      .backup-actions .text-btn,.backup-actions .small-btn{padding:7px 9px;font-size:10px}
+    }
+    @media(max-width:375px){
+      .topbar{height:auto;min-height:67px;padding:10px 0;flex-wrap:wrap;row-gap:8px}
+      .top-actions{width:100%;justify-content:space-between}
+      .language-select{max-width:100px}
+      .save-status{width:auto;min-width:100px}
+    }
+    @media(max-width:420px){
+      .panel-heading{flex-wrap:wrap;align-items:flex-start}
+      .panel-heading>div{min-width:0}
+      #expenseViewToggle{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+      #expenseViewToggle button{min-width:0;padding:7px 3px;overflow-wrap:anywhere;line-height:1.25}
+      .backup-actions{flex-wrap:wrap}
+      .backup-actions .text-btn,.backup-actions .small-btn{white-space:normal}
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">L</span> ledgerly</div>
+      <div class="top-actions">
+        <button id="historyButton" class="small-btn desktop-nav" data-i18n="history">History</button>
+        <div id="saveStatus" class="save-status" role="status" aria-live="polite">
+          <span id="saveStatusText">Saving...</span>
+          <span id="lastSavedText" class="last-saved"></span>
+        </div>
+        <label class="language-control" title="Language" data-i18n-title="language"><span aria-hidden="true">🌐</span><select id="languageSelector" class="language-select" aria-label="Language" data-i18n-aria="language"></select></label>
+        <button id="themeToggle" class="icon-btn" aria-label="Toggle color theme" title="Toggle color theme" data-i18n-aria="toggleTheme" data-i18n-title="toggleTheme">☾</button>
+      </div>
+    </header>
+    <main>
+      <div class="main-heading">
+        <div><div class="eyebrow" data-i18n="tagline">Your money, in focus</div><h1 id="greeting"></h1><div id="todayLabel" class="date-label"></div></div>
+        <div class="backup-actions">
+          <button id="exportBackupButton" class="text-btn" type="button" data-i18n="exportBackup">↓ Export Backup</button>
+          <button id="importBackupButton" class="small-btn" type="button" data-i18n="importBackup">↑ Import Backup</button>
+          <input id="backupFileInput" class="hidden" type="file" accept=".json,application/json" aria-label="Import backup file" data-i18n-aria="importBackup">
+        </div>
+      </div>
+      <section class="summary-grid" aria-label="Financial summary" data-i18n-aria="financialSummary">
+        <article class="summary-card balance-card"><div class="summary-title"><span data-i18n="totalBalance">Total balance</span> <span class="summary-icon">◈</span></div><div id="balanceValue" class="summary-value"></div><div class="summary-meta" data-i18n="incomeMinusExpenses">Income minus expenses</div></article>
+        <article class="summary-card"><div class="summary-title"><span data-i18n="totalIncome">Total income</span> <span class="summary-icon">↗</span></div><div id="incomeValue" class="summary-value"></div><div id="incomeMeta" class="summary-meta"></div></article>
+        <article class="summary-card"><div class="summary-title"><span data-i18n="totalExpenses">Total expenses</span> <span class="summary-icon">↘</span></div><div id="expenseValue" class="summary-value"></div><div id="expenseMeta" class="summary-meta"></div></article>
+        <article class="summary-card"><div class="summary-title"><span data-i18n="plannedVsActual">Planned vs actual</span> <span class="summary-icon">◎</span></div><div id="plannedActualValue" class="summary-value"></div><div id="plannedActualMeta" class="summary-meta"></div></article>
+      </section>
+
+      <section id="dashboardView">
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-heading"><div><h2 data-i18n="myPlannings">My Plannings</h2><p class="subtle" data-i18n="planningSubtitle">Give your goals a little direction</p></div><button id="addPlanButton" class="primary-btn" data-i18n="addPlan">＋ Add plan</button></div>
+            <div class="planning-total"><span class="subtle" data-i18n="totalPlanned">Total planned amount</span><strong id="planTotal"></strong></div>
+            <div class="filter-row">
+              <select id="planCategoryFilter" aria-label="Filter plans by category" data-i18n-aria="filterPlansCategory"></select>
+              <select id="planMonthFilter" aria-label="Filter plans by month" data-i18n-aria="filterPlansMonth"></select>
+              <select id="planYearFilter" aria-label="Filter plans by year" data-i18n-aria="filterPlansYear"></select>
+            </div>
+            <div id="planningList" class="card-list"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-heading"><div><h2 data-i18n="myExpenses">My Expenses</h2><p class="subtle" data-i18n="expenseSubtitle">The little details add up</p></div><button id="addExpenseButton" class="primary-btn" data-i18n="addExpense">＋ Add expense</button></div>
+            <div class="filter-row"><div id="expenseViewToggle" class="segmented"><button data-view="daily" class="active" data-i18n="daily">Daily</button><button data-view="weekly" data-i18n="weekly">Weekly</button><button data-view="monthly" data-i18n="monthly">Monthly</button><button data-view="yearly" data-i18n="yearly">Yearly</button></div></div>
+            <div class="filter-row">
+              <input id="expenseDateFilter" type="date" aria-label="Filter by date" data-i18n-aria="filterByDate">
+              <select id="expenseCategoryFilter" aria-label="Filter expenses by category" data-i18n-aria="filterExpensesCategory"></select>
+              <input id="expenseSearch" type="search" placeholder="Search..." aria-label="Search expenses" data-i18n-placeholder="search">
+            </div>
+            <div id="expenseList"></div>
+            <button id="showAllExpenses" class="text-btn" data-i18n="viewAllExpenses">View all expenses →</button>
+          </section>
+        </div>
+
+        <div class="below-grid">
+          <section class="panel"><div class="panel-heading"><div><h2 data-i18n="planningVsSpending">Planning vs spending</h2><p class="subtle" data-i18n="planningComparisonSubtitle">Keep your categories on track</p></div></div><div id="comparisonList"></div><div id="comparisonSummary" class="subtle" style="margin-top:13px;line-height:1.6"></div></section>
+          <section class="panel"><div class="panel-heading"><div><h2 data-i18n="incomeSavings">Income &amp; savings</h2><p class="subtle" data-i18n="incomeSubtitle">Make room for what matters</p></div><button id="addIncomeButton" class="primary-btn" data-i18n="addIncome">＋ Add income</button></div><div id="incomeBreakdown"></div></section>
+        </div>
+        <div class="charts-grid">
+          <section class="panel chart-panel"><div class="panel-heading"><div><h2 data-i18n="expensesByCategory">Expenses by category</h2><p class="subtle" data-i18n="categoryChartSubtitle">Where your money goes</p></div></div><div id="categoryChart" class="chart-wrap" role="img" aria-label="Expenses by category chart" data-i18n-aria="expensesByCategoryChart"></div></section>
+          <section class="panel chart-panel"><div class="panel-heading"><div><h2 data-i18n="incomeVsExpenses">Income vs expenses</h2><p class="subtle" data-i18n="monthlyCashFlow">Monthly cash flow</p></div></div><div id="monthlyChart" class="chart-wrap" role="img" aria-label="Monthly income and expenses chart" data-i18n-aria="monthlyIncomeChart"></div></section>
+          <section class="panel chart-panel"><div class="panel-heading"><div><h2 data-i18n="dailySpendingTrend">Daily spending trend</h2><p class="subtle" data-i18n="last14Days">Your last 14 days</p></div></div><div id="trendChart" class="chart-wrap" role="img" aria-label="Daily spending trend chart" data-i18n-aria="dailyTrendChart"></div></section>
+          <section class="panel chart-panel"><div class="panel-heading"><div><h2 data-i18n="planVsActual">Plan vs actual</h2><p class="subtle" data-i18n="byCategory">By category</p></div></div><div id="planChart" class="chart-wrap" role="img" aria-label="Planned and actual spending chart" data-i18n-aria="plannedActualChart"></div></section>
+        </div>
+      </section>
+      <section id="historyView" class="page-view page-hidden">
+        <div class="panel"><div class="panel-heading"><div><h2 data-i18n="fullHistory">Full history</h2><p class="subtle" data-i18n="allRecords">All your plans, expenses, and income</p></div><input id="historySearch" type="search" placeholder="Search your history..." aria-label="Search history" data-i18n-placeholder="searchHistory" data-i18n-aria="searchHistory"></div><div class="filter-row"><select id="historyType"><option value="">Everything</option><option value="planning">Plannings</option><option value="expense">Expenses</option><option value="income">Income</option></select><select id="historyYear"><option value="">All years</option></select></div><div id="historyList" class="history-grid"></div></div>
+      </section>
+    </main>
+  </div>
+  <nav id="bottomNav" class="bottom-nav" aria-label="Main navigation" data-i18n-aria="mainNavigation"><button class="active" data-page="dashboard"><span>⌂</span><span data-i18n="dashboard">Dashboard</span></button><button data-page="history"><span>▤</span><span data-i18n="history">History</span></button><button id="mobileAddButton"><span>＋</span><span data-i18n="addNew">Add new</span></button></nav>
+  <div id="modalRoot"></div>
+  <div id="toastRoot" aria-live="polite"></div>
+
+  <script>
+    const languageCodes = ["en","ta","hi","te","ml","kn","bn","mr","es","fr","de","ja","ko","zh","ar"];
+    const languageNames = {en:"English",ta:"தமிழ்",hi:"हिन्दी",te:"తెలుగు",ml:"മലയാളം",kn:"ಕನ್ನಡ",bn:"বাংলা",mr:"मराठी",es:"Español",fr:"Français",de:"Deutsch",ja:"日本語",ko:"한국어",zh:"中文",ar:"العربية"};
+    const localeInfo = {
+      en:{locale:"en-IN",currency:"INR"},ta:{locale:"ta-IN",currency:"INR"},hi:{locale:"hi-IN",currency:"INR"},
+      te:{locale:"te-IN",currency:"INR"},ml:{locale:"ml-IN",currency:"INR"},kn:{locale:"kn-IN",currency:"INR"},
+      bn:{locale:"bn-BD",currency:"BDT"},mr:{locale:"mr-IN",currency:"INR"},es:{locale:"es-ES",currency:"EUR"},
+      fr:{locale:"fr-FR",currency:"EUR"},de:{locale:"de-DE",currency:"EUR"},ja:{locale:"ja-JP",currency:"JPY"},
+      ko:{locale:"ko-KR",currency:"KRW"},zh:{locale:"zh-CN",currency:"CNY"},ar:{locale:"ar-SA",currency:"SAR"}
+    };
+    const translationRows = {
+      pageTitle:["Ledgerly — Expense tracker","Ledgerly — செலவு கண்காணிப்பு","Ledgerly — खर्च ट्रैकर","Ledgerly — ఖర్చుల ట్రాకర్","Ledgerly — ചെലവ് ട്രാക്കർ","Ledgerly — ಖರ್ಚು ಟ್ರ್ಯಾಕರ್","Ledgerly — খরচ ট্র্যাকার","Ledgerly — खर्च ट्रॅकर","Ledgerly — Control de gastos","Ledgerly — Suivi des dépenses","Ledgerly — Ausgaben-Tracker","Ledgerly — 支出トラッカー","Ledgerly — 지출 추적기","Ledgerly — 费用追踪器","Ledgerly — متتبع المصروفات"],
+      mainNavigation:["Main navigation","முதன்மை வழிசெலுத்தல்","मुख्य नेविगेशन","ప్రధాన నావిగేషన్","പ്രധാന നാവിഗേഷൻ","ಮುಖ್ಯ ನ್ಯಾವಿಗೇಶನ್","প্রধান নেভিগেশন","मुख्य नेव्हिगेशन","Navegación principal","Navigation principale","Hauptnavigation","メインナビゲーション","주요 탐색","主导航","التنقل الرئيسي"],
+      expensesByCategoryChart:["Expenses by category chart","வகைப்படி செலவு வரைபடம்","श्रेणी के अनुसार खर्च चार्ट","వర్గాల వారీ ఖర్చు చార్ట్","വിഭാഗ തിരിച്ചുള്ള ചെലവ് ചാർട്ട്","ವರ್ಗವಾರು ವೆಚ್ಚದ ಚಾರ್ಟ್","বিভাগ অনুযায়ী খরচের চার্ট","श्रेणीनुसार खर्चाचा आलेख","Gráfico de gastos por categoría","Graphique des dépenses par catégorie","Ausgaben nach Kategorie","カテゴリ別支出グラフ","카테고리별 지출 차트","分类支出图表","مخطط المصروفات حسب الفئة"],
+      monthlyIncomeChart:["Monthly income and expenses chart","மாத வருமானம் மற்றும் செலவு வரைபடம்","मासिक आय और खर्च चार्ट","నెలవారీ ఆదాయం, ఖర్చుల చార్ట్","പ്രതിമാസ വരുമാന ചെലവ് ചാർട്ട്","ಮಾಸಿಕ ಆದಾಯ ಮತ್ತು ವೆಚ್ಚದ ಚಾರ್ಟ್","মাসিক আয় ও খরচের চার্ট","मासिक उत्पन्न आणि खर्चाचा आलेख","Gráfico mensual de ingresos y gastos","Graphique mensuel des revenus et dépenses","Monatliche Einnahmen und Ausgaben","月別の収入と支出グラフ","월별 수입 및 지출 차트","每月收入与支出图表","مخطط الدخل والمصروفات الشهري"],
+      dailyTrendChart:["Daily spending trend chart","தினசரி செலவுப் போக்கு வரைபடம்","दैनिक खर्च रुझान चार्ट","రోజువారీ ఖర్చుల ధోరణి చార్ట్","പ്രതിദിന ചെലവ് പ്രവണത ചാർട്ട്","ದೈನಂದಿನ ವೆಚ್ಚದ ಪ್ರವೃತ್ತಿ ಚಾರ್ಟ್","দৈনিক খরচের প্রবণতার চার্ট","दैनिक खर्चाच्या कलाचा आलेख","Gráfico de tendencia diaria de gastos","Graphique de tendance quotidienne des dépenses","Täglicher Ausgabentrend","毎日の支出推移グラフ","일일 지출 추이 차트","每日支出趋势图","مخطط اتجاه الإنفاق اليومي"],
+      plannedActualChart:["Planned and actual spending chart","திட்டமிட்ட மற்றும் உண்மையான செலவு வரைபடம்","नियोजित और वास्तविक खर्च चार्ट","ప్రణాళిక, వాస్తవ ఖర్చుల చార్ట్","ആസൂത്രിതവും യഥാർത്ഥവുമായ ചെലവുകളുടെ ചാർട്ട്","ಯೋಜಿತ ಮತ್ತು ವಾಸ್ತವ ವೆಚ್ಚದ ಚಾರ್ಟ್","পরিকল্পিত ও প্রকৃত খরচের চার্ট","नियोजित आणि प्रत्यक्ष खर्चाचा आलेख","Gráfico de gastos previstos y reales","Graphique des dépenses prévues et réelles","Geplante und tatsächliche Ausgaben","予定と実績の支出グラフ","계획 및 실제 지출 차트","计划与实际支出图表","مخطط الإنفاق المخطط والفعلي"],
+      language:["Language","மொழி","भाषा","భాష","ഭാഷ","ಭಾಷೆ","ভাষা","भाषा","Idioma","Langue","Sprache","言語","언어","语言","اللغة"],
+      history:["History","வரலாறு","इतिहास","చరిత్ర","ചരിത്രം","ಇತಿಹಾಸ","ইতিহাস","इतिहास","Historial","Historique","Verlauf","履歴","기록","历史","السجل"],
+      dashboard:["Dashboard","முகப்புப் பலகை","डैशबोर्ड","డాష్‌బోర్డ్","ഡാഷ്ബോർഡ്","ಡ್ಯಾಶ್‌ಬೋರ್ಡ್","ড্যাশবোর্ড","डॅशबोर्ड","Panel","Tableau de bord","Übersicht","ダッシュボード","대시보드","仪表板","لوحة التحكم"],
+      addNew:["Add new","புதியதைச் சேர்","नया जोड़ें","కొత్తది జోడించండి","പുതിയത് ചേർക്കുക","ಹೊಸದನ್ನು ಸೇರಿಸಿ","নতুন যোগ করুন","नवीन जोडा","Añadir","Ajouter","Hinzufügen","新しく追加","새 항목 추가","添加","إضافة جديد"],
+      tagline:["Your money, in focus","உங்கள் பணம், உங்கள் கட்டுப்பாட்டில்","आपका पैसा, आपकी नज़र में","మీ డబ్బు, మీ దృష్టిలో","നിങ്ങളുടെ പണം, നിങ്ങളുടെ ശ്രദ്ധയിൽ","ನಿಮ್ಮ ಹಣ, ನಿಮ್ಮ ಗಮನದಲ್ಲಿ","আপনার অর্থ, আপনার নজরে","तुमचे पैसे, तुमच्या नजरेत","Tu dinero, bajo control","Votre argent, en vue","Ihr Geld im Blick","お金を、ひと目で管理","내 돈을 한눈에","掌握您的资金","أموالك تحت السيطرة"],
+      greeting:["Hello, {day}!","வணக்கம், {day}!","नमस्ते, {day}!","నమస్కారం, {day}!","നമസ്കാരം, {day}!","ನಮಸ್ಕಾರ, {day}!","নমস্কার, {day}!","नमस्कार, {day}!","¡Hola, {day}!","Bonjour, {day} !","Hallo, {day}!","こんにちは、{day}！","안녕하세요, {day}!","你好，{day}！","مرحبًا، {day}!"],
+      savedLocally:["Saved on this device","இந்தச் சாதனத்தில் சேமிக்கப்பட்டது","इस डिवाइस पर सहेजा गया","ఈ పరికరంలో సేవ్ చేయబడింది","ഈ ഉപകരണത്തിൽ സംരക്ഷിച്ചു","ಈ ಸಾಧನದಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ","এই ডিভাইসে সংরক্ষিত","या डिव्हाइसवर जतन केले","Guardado en este dispositivo","Enregistré sur cet appareil","Auf diesem Gerät gespeichert","この端末に保存済み","이 기기에 저장됨","已保存在此设备","محفوظ على هذا الجهاز"],
+      financialSummary:["Financial summary","நிதிச் சுருக்கம்","वित्तीय सारांश","ఆర్థిక సారాంశం","സാമ്പത്തിക സംഗ്രഹം","ಹಣಕಾಸಿನ ಸಾರಾಂಶ","আর্থিক সারাংশ","आर्थिक सारांश","Resumen financiero","Résumé financier","Finanzübersicht","家計の概要","재정 요약","财务摘要","الملخص المالي"],
+      totalBalance:["Total balance","மொத்த இருப்பு","कुल शेष राशि","మొత్తం నిల్వ","ആകെ ബാലൻസ്","ಒಟ್ಟು ಬಾಕಿ","মোট ব্যালেন্স","एकूण शिल्लक","Saldo total","Solde total","Gesamtsaldo","合計残高","총 잔액","总余额","إجمالي الرصيد"],
+      incomeMinusExpenses:["Income minus expenses","வருமானம் கழித்த செலவுகள்","आय घटा खर्च","ఆదాయం మైనస్ ఖర్చులు","വരുമാനം കുറവ് ചെലവ്","ಆದಾಯ ಮೈನಸ್ ವೆಚ್ಚ","আয় বিয়োগ ব্যয়","उत्पन्न वजा खर्च","Ingresos menos gastos","Revenus moins dépenses","Einnahmen minus Ausgaben","収入から支出を引いた額","수입에서 지출을 뺀 금액","收入减支出","الدخل مطروحًا منه المصروفات"],
+      totalIncome:["Total income","மொத்த வருமானம்","कुल आय","మొత్తం ఆదాయం","ആകെ വരുമാനം","ಒಟ್ಟು ಆದಾಯ","মোট আয়","एकूण उत्पन्न","Ingresos totales","Revenus totaux","Gesamteinnahmen","総収入","총수입","总收入","إجمالي الدخل"],
+      salaryOther:["{salary} salary · {other} other","சம்பளம் {salary} · பிற வருமானம் {other}","वेतन {salary} · अन्य {other}","జీతం {salary} · ఇతరాలు {other}","ശമ്പളം {salary} · മറ്റ് വരുമാനം {other}","ಸಂಬಳ {salary} · ಇತರೆ {other}","বেতন {salary} · অন্যান্য {other}","पगार {salary} · इतर {other}","Sueldo {salary} · otros {other}","Salaire {salary} · autres {other}","Gehalt {salary} · sonstige {other}","給与 {salary} · その他 {other}","급여 {salary} · 기타 {other}","工资 {salary} · 其他 {other}","راتب {salary} · أخرى {other}"],
+      totalExpenses:["Total expenses","மொத்த செலவுகள்","कुल खर्च","మొత్తం ఖర్చులు","ആകെ ചെലവുകൾ","ಒಟ್ಟು ವೆಚ್ಚಗಳು","মোট খরচ","एकूण खर्च","Gastos totales","Dépenses totales","Gesamtausgaben","総支出","총지출","总支出","إجمالي المصروفات"],
+      acrossAllTime:["Across all time","எல்லா காலத்திற்குமானது","सभी समय का","అన్ని సమయాల మొత్తం","എല്ലാ കാലത്തെയും","ಎಲ್ಲಾ ಅವಧಿಯ ಒಟ್ಟು","সব সময়ের মোট","सर्व काळातील","De todo el período","Toutes périodes","Gesamter Zeitraum","全期間","전체 기간","全部时间","على مدار الوقت"],
+      plannedVsActual:["Planned vs actual","திட்டமிட்டது மற்றும் உண்மை","योजना बनाम वास्तविक","ప్రణాళిక మరియు వాస్తవం","പദ്ധതിയും യഥാർത്ഥവും","ಯೋಜನೆ ಮತ್ತು ವಾಸ್ತವ","পরিকল্পনা বনাম প্রকৃত","नियोजन विरुद्ध प्रत्यक्ष","Planificado vs real","Prévu vs réel","Geplant vs. tatsächlich","予算と実績","계획 대비 실제","计划与实际","المخطط مقابل الفعلي"],
+      plannedActualMeta:["{planned} planned · {actual} actual","திட்டம் {planned} · உண்மை {actual}","योजना {planned} · वास्तविक {actual}","ప్రణాళిక {planned} · వాస్తవం {actual}","പദ്ധതി {planned} · യഥാർത്ഥം {actual}","ಯೋಜನೆ {planned} · ವಾಸ್ತವ {actual}","পরিকল্পনা {planned} · প্রকৃত {actual}","नियोजित {planned} · प्रत्यक्ष {actual}","Previsto {planned} · real {actual}","Prévu {planned} · réel {actual}","Geplant {planned} · tatsächlich {actual}","予算 {planned} · 実績 {actual}","계획 {planned} · 실제 {actual}","计划 {planned} · 实际 {actual}","المخطط {planned} · الفعلي {actual}"],
+      transactionOne:["{count} recorded transaction","பதிவு செய்யப்பட்ட பரிவர்த்தனை {count}","दर्ज लेन-देन {count}","నమోదైన లావాదేవీ {count}","രേഖപ്പെടുത്തിയ ഇടപാട് {count}","ದಾಖಲಾದ ವಹಿವಾಟು {count}","নথিভুক্ত লেনদেন {count}","नोंदवलेला व्यवहार {count}","{count} transacción registrada","{count} transaction enregistrée","{count} erfasste Buchung","記録済み取引 {count} 件","기록된 거래 {count}건","已记录 {count} 笔交易","{count} معاملة مسجلة"],
+      transactionMany:["{count} recorded transactions","பதிவு செய்யப்பட்ட பரிவர்த்தனைகள் {count}","दर्ज लेन-देन {count}","నమోదైన లావాదేవీలు {count}","രേഖപ്പെടുത്തിയ ഇടപാടുകൾ {count}","ದಾಖಲಾದ ವಹಿವಾಟುಗಳು {count}","নথিভুক্ত লেনদেন {count}","नोंदवलेले व्यवहार {count}","{count} transacciones registradas","{count} transactions enregistrées","{count} erfasste Buchungen","記録済み取引 {count} 件","기록된 거래 {count}건","已记录 {count} 笔交易","{count} معاملات مسجلة"],
+      myPlannings:["My Plannings","எனது திட்டங்கள்","मेरी योजनाएँ","నా ప్రణాళికలు","എന്റെ പദ്ധതികൾ","ನನ್ನ ಯೋಜನೆಗಳು","আমার পরিকল্পনা","माझे नियोजन","Mis planes","Mes projets","Meine Planungen","予定","내 계획","我的计划","خططي"],
+      planningSubtitle:["Give your goals a little direction","உங்கள் இலக்குகளுக்கு ஒரு வழிகாட்டுதல் கொடுங்கள்","अपने लक्ष्यों को दिशा दें","మీ లక్ష్యాలకు దిశానిర్దేశం చేయండి","നിങ്ങളുടെ ലക്ഷ്യങ്ങൾക്ക് ദിശ നൽകൂ","ನಿಮ್ಮ ಗುರಿಗಳಿಗೆ ದಿಕ್ಕು ನೀಡಿ","আপনার লক্ষ্যকে দিকনির্দেশ দিন","तुमच्या ध्येयांना दिशा द्या","Dale dirección a tus metas","Donnez un cap à vos objectifs","Geben Sie Ihren Zielen eine Richtung","目標に少し方向性を","목표에 방향을 더해 보세요","为目标设定方向","امنح أهدافك مسارًا واضحًا"],
+      addPlan:["＋ Add plan","＋ திட்டத்தைச் சேர்","＋ योजना जोड़ें","＋ ప్రణాళికను జోడించండి","＋ പദ്ധതി ചേർക്കുക","＋ ಯೋಜನೆ ಸೇರಿಸಿ","＋ পরিকল্পনা যোগ করুন","＋ नियोजन जोडा","＋ Añadir plan","＋ Ajouter un projet","＋ Planung hinzufügen","＋ 予定を追加","＋ 계획 추가","＋ 添加计划","＋ إضافة خطة"],
+      totalPlanned:["Total planned amount","மொத்த திட்டத் தொகை","कुल नियोजित राशि","మొత్తం ప్రణాళిక మొత్తం","ആകെ ആസൂത്രിത തുക","ಒಟ್ಟು ಯೋಜಿತ ಮೊತ್ತ","মোট পরিকল্পিত পরিমাণ","एकूण नियोजित रक्कम","Importe total previsto","Montant total prévu","Geplanter Gesamtbetrag","予定合計額","총 계획 금액","计划总额","إجمالي المبلغ المخطط"],
+      allCategories:["All categories","அனைத்து வகைகளும்","सभी श्रेणियाँ","అన్ని వర్గాలు","എല്ലാ വിഭാഗങ്ങളും","ಎಲ್ಲಾ ವರ್ಗಗಳು","সব বিভাগ","सर्व श्रेणी","Todas las categorías","Toutes les catégories","Alle Kategorien","すべてのカテゴリ","모든 카테고리","所有类别","كل الفئات"],
+      allMonths:["All months","அனைத்து மாதங்களும்","सभी महीने","అన్ని నెలలు","എല്ലാ മാസങ്ങളും","ಎಲ್ಲಾ ತಿಂಗಳುಗಳು","সব মাস","सर्व महिने","Todos los meses","Tous les mois","Alle Monate","すべての月","모든 달","所有月份","كل الأشهر"],
+      allYears:["All years","அனைத்து ஆண்டுகளும்","सभी वर्ष","అన్ని సంవత్సరాలు","എല്ലാ വർഷങ്ങളും","ಎಲ್ಲಾ ವರ್ಷಗಳು","সব বছর","सर्व वर्षे","Todos los años","Toutes les années","Alle Jahre","すべての年","모든 연도","所有年份","كل السنوات"],
+      emptyPlans:["No plans here yet. Add one to get started.","திட்டங்கள் இல்லை. தொடங்க ஒன்றைச் சேர்க்கவும்.","अभी कोई योजना नहीं है। शुरू करने के लिए जोड़ें।","ప్రణాళికలు లేవు. ప్రారంభించడానికి ఒకటి జోడించండి.","ഇപ്പോൾ പദ്ധതികളില്ല. തുടങ്ങാൻ ഒന്ന് ചേർക്കൂ.","ಇಲ್ಲಿ ಯೋಜನೆಗಳಿಲ್ಲ. ಆರಂಭಿಸಲು ಒಂದನ್ನು ಸೇರಿಸಿ.","এখনও কোনো পরিকল্পনা নেই। শুরু করতে একটি যোগ করুন।","अजून नियोजन नाही. सुरुवात करण्यासाठी जोडा.","Aún no hay planes. Añade uno para empezar.","Aucun projet pour l’instant. Ajoutez-en un pour commencer.","Noch keine Planung vorhanden. Fügen Sie eine hinzu.","予定はまだありません。追加して始めましょう。","아직 계획이 없습니다. 추가해 시작하세요.","暂无计划。添加一项以开始。","لا توجد خطط بعد. أضف خطة للبدء."],
+      myExpenses:["My Expenses","எனது செலவுகள்","मेरे खर्च","నా ఖర్చులు","എന്റെ ചെലവുകൾ","ನನ್ನ ವೆಚ್ಚಗಳು","আমার খরচ","माझे खर्च","Mis gastos","Mes dépenses","Meine Ausgaben","支出","내 지출","我的支出","مصروفاتي"],
+      expenseSubtitle:["The little details add up","சிறு விவரங்களும் சேர்ந்து பெரியதாகும்","छोटी-छोटी बातें भी मायने रखती हैं","చిన్న వివరాలే కలిసి పెద్దవి అవుతాయి","ചെറിയ കാര്യങ്ങളും കൂട്ടിച്ചേർന്നാൽ വലുതാകും","ಸಣ್ಣ ವಿವರಗಳೂ ಸೇರಿ ದೊಡ್ಡದಾಗುತ್ತವೆ","ছোট বিষয়গুলোও যোগ হয়","छोट्या गोष्टींचीही बेरीज होते","Los pequeños detalles suman","Les petits détails comptent","Kleine Beträge summieren sich","小さな支出も積み重なります","작은 지출도 모이면 커집니다","点滴开支，积少成多","التفاصيل الصغيرة تتراكم"],
+      addExpense:["＋ Add expense","＋ செலவைச் சேர்","＋ खर्च जोड़ें","＋ ఖర్చును జోడించండి","＋ ചെലവ് ചേർക്കുക","＋ ವೆಚ್ಚ ಸೇರಿಸಿ","＋ খরচ যোগ করুন","＋ खर्च जोडा","＋ Añadir gasto","＋ Ajouter une dépense","＋ Ausgabe hinzufügen","＋ 支出を追加","＋ 지출 추가","＋ 添加支出","＋ إضافة مصروف"],
+      daily:["Daily","தினசரி","दैनिक","రోజువారీ","പ്രതിദിനം","ದೈನಂದಿನ","দৈনিক","दैनिक","Diario","Quotidien","Täglich","日別","일별","每日","يومي"],
+      weekly:["Weekly","வாராந்திரம்","साप्ताहिक","వారపు","പ്രതിവാരം","ವಾರದ","সাপ্তাহিক","साप्ताहिक","Semanal","Hebdomadaire","Wöchentlich","週別","주별","每周","أسبوعي"],
+      monthly:["Monthly","மாதாந்திரம்","मासिक","నెలవారీ","പ്രതിമാസം","ಮಾಸಿಕ","মাসিক","मासिक","Mensual","Mensuel","Monatlich","月別","월별","每月","شهري"],
+      yearly:["Yearly","ஆண்டுதோறும்","वार्षिक","వార్షిక","വാർഷികം","ವಾರ್ಷಿಕ","বার্ষিক","वार्षिक","Anual","Annuel","Jährlich","年別","연별","每年","سنوي"],
+      filterByDate:["Filter by date","தேதியின்படி வடிகட்டு","तिथि के अनुसार फ़िल्टर करें","తేదీ ప్రకారం వడపోసి","തീയതി പ്രകാരം ഫിൽട്ടർ ചെയ്യുക","ದಿನಾಂಕದಂತೆ ಫಿಲ್ಟರ್ ಮಾಡಿ","তারিখ অনুযায়ী ফিল্টার","तारखेनुसार फिल्टर","Filtrar por fecha","Filtrer par date","Nach Datum filtern","日付で絞り込む","날짜별 필터","按日期筛选","تصفية حسب التاريخ"],
+      filterExpensesCategory:["Filter expenses by category","வகைப்படி செலவுகளை வடிகட்டு","श्रेणी के अनुसार खर्च फ़िल्टर करें","వర్గం ప్రకారం ఖర్చులను వడపోసి","വിഭാഗം പ്രകാരം ചെലവുകൾ ഫിൽട്ടർ ചെയ്യുക","ವರ್ಗದಂತೆ ವೆಚ್ಚಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ","বিভাগ অনুযায়ী খরচ ফিল্টার","श्रेणीनुसार खर्च फिल्टर","Filtrar gastos por categoría","Filtrer par catégorie","Ausgaben nach Kategorie filtern","カテゴリで支出を絞り込む","카테고리별 지출 필터","按类别筛选支出","تصفية المصروفات حسب الفئة"],
+      filterPlansCategory:["Filter plans by category","வகைப்படி திட்டங்களை வடிகட்டு","श्रेणी के अनुसार योजनाएँ फ़िल्टर करें","వర్గం ప్రకారం ప్రణాళికలను వడపోసి","വിഭാഗം പ്രകാരം പദ്ധതികൾ ഫിൽട്ടർ ചെയ്യുക","ವರ್ಗದಂತೆ ಯೋಜನೆಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ","বিভাগ অনুযায়ী পরিকল্পনা ফিল্টার","श्रेणीनुसार नियोजन फिल्टर","Filtrar planes por categoría","Filtrer par catégorie","Planungen nach Kategorie filtern","カテゴリで予定を絞り込む","카테고리별 계획 필터","按类别筛选计划","تصفية الخطط حسب الفئة"],
+      filterPlansMonth:["Filter plans by month","மாதப்படி திட்டங்களை வடிகட்டு","महीने के अनुसार योजनाएँ फ़िल्टर करें","నెల ప్రకారం ప్రణాళికలను వడపోసి","മാസം പ്രകാരം പദ്ധതികൾ ഫിൽട്ടർ ചെയ്യുക","ತಿಂಗಳಂತೆ ಯೋಜನೆಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ","মাস অনুযায়ী পরিকল্পনা ফিল্টার","महिन्यानुसार नियोजन फिल्टर","Filtrar planes por mes","Filtrer par mois","Planungen nach Monat filtern","月で予定を絞り込む","월별 계획 필터","按月份筛选计划","تصفية الخطط حسب الشهر"],
+      filterPlansYear:["Filter plans by year","ஆண்டுப்படி திட்டங்களை வடிகட்டு","वर्ष के अनुसार योजनाएँ फ़िल्टर करें","సంవత్సరం ప్రకారం ప్రణాళికలను వడపోసి","വർഷം പ്രകാരം പദ്ധതികൾ ഫിൽട്ടർ ചെയ്യുക","ವರ್ಷದಂತೆ ಯೋಜನೆಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ","বছর অনুযায়ী পরিকল্পনা ফিল্টার","वर्षानुसार नियोजन फिल्टर","Filtrar planes por año","Filtrer par année","Planungen nach Jahr filtern","年で予定を絞り込む","연도별 계획 필터","按年份筛选计划","تصفية الخطط حسب السنة"],
+      search:["Search...","தேடு...","खोजें...","వెతకండి...","തിരയുക...","ಹುಡುಕಿ...","খুঁজুন...","शोधा...","Buscar...","Rechercher...","Suchen...","検索...","검색...","搜索...","بحث..."],
+      viewAllExpenses:["View all expenses →","அனைத்து செலவுகளையும் காண்க →","सभी खर्च देखें →","అన్ని ఖర్చులను చూడండి →","എല്ലാ ചെലവുകളും കാണുക →","ಎಲ್ಲಾ ವೆಚ್ಚಗಳನ್ನು ನೋಡಿ →","সব খরচ দেখুন →","सर्व खर्च पहा →","Ver todos los gastos →","Voir toutes les dépenses →","Alle Ausgaben ansehen →","すべての支出を見る →","모든 지출 보기 →","查看所有支出 →","عرض كل المصروفات →"],
+      emptyExpenses:["No expenses for this view yet.","இந்தக் காட்சியில் செலவுகள் இல்லை.","इस दृश्य में अभी कोई खर्च नहीं है।","ఈ వీక్షణలో ఖర్చులు లేవు.","ഈ കാഴ്ചയിൽ ചെലവുകളില്ല.","ಈ ವೀಕ್ಷಣೆಯಲ್ಲಿ ವೆಚ್ಚಗಳಿಲ್ಲ.","এই দৃশ্যে কোনো খরচ নেই।","या दृश्यात खर्च नाहीत.","No hay gastos en esta vista.","Aucune dépense dans cette vue.","Keine Ausgaben in dieser Ansicht.","この表示に支出はありません。","이 보기에는 지출이 없습니다.","此视图暂无支出。","لا توجد مصروفات في هذا العرض."],
+      planningVsSpending:["Planning vs spending","திட்டமிடல் மற்றும் செலவு","योजना बनाम खर्च","ప్రణాళిక మరియు ఖర్చు","പദ്ധതിയും ചെലവും","ಯೋಜನೆ ಮತ್ತು ವೆಚ್ಚ","পরিকল্পনা বনাম খরচ","नियोजन विरुद्ध खर्च","Planificación y gastos","Prévisions et dépenses","Planung und Ausgaben","予定と支出","계획 대비 지출","计划与支出","التخطيط مقابل الإنفاق"],
+      planningComparisonSubtitle:["Keep your categories on track","உங்கள் வகைகளைச் சரியான பாதையில் வைத்திருங்கள்","अपनी श्रेणियों को सही रखें","మీ వర్గాలను సరైన మార్గంలో ఉంచండి","വിഭാഗങ്ങൾ നിയന്ത്രണത്തിൽ വയ്ക്കൂ","ನಿಮ್ಮ ವರ್ಗಗಳನ್ನು ಸರಿದಾರಿಯಲ್ಲಿ ಇರಿಸಿ","বিভাগগুলো নিয়ন্ত্রণে রাখুন","तुमच्या श्रेणी योग्य ठेवा","Mantén tus categorías bajo control","Gardez vos catégories sous contrôle","Behalten Sie Ihre Kategorien im Blick","カテゴリごとの予算を管理","카테고리별 예산을 관리하세요","合理规划各类别支出","حافظ على توازن الفئات"],
+      addPlansComparison:["Add plans and expenses to compare them.","ஒப்பிட திட்டங்களையும் செலவுகளையும் சேர்க்கவும்.","तुलना करने के लिए योजनाएँ और खर्च जोड़ें।","పోల్చడానికి ప్రణాళికలు మరియు ఖర్చులు జోడించండి.","താരതമ്യം ചെയ്യാൻ പദ്ധതികളും ചെലവുകളും ചേർക്കൂ.","ಹೋಲಿಸಲು ಯೋಜನೆಗಳು ಮತ್ತು ವೆಚ್ಚಗಳನ್ನು ಸೇರಿಸಿ.","তুলনা করতে পরিকল্পনা ও খরচ যোগ করুন।","तुलनेसाठी नियोजन आणि खर्च जोडा.","Añade planes y gastos para compararlos.","Ajoutez des projets et dépenses à comparer.","Fügen Sie Planungen und Ausgaben hinzu.","比較するには予定と支出を追加してください。","비교할 계획과 지출을 추가하세요.","添加计划和支出进行比较。","أضف الخطط والمصروفات للمقارنة."],
+      notPlanned:["not planned","திட்டமிடப்படவில்லை","योजना नहीं","ప్రణాళిక లేదు","പദ്ധതിയില്ല","ಯೋಜಿಸಿಲ್ಲ","পরিকল্পনা নেই","नियोजित नाही","sin planificar","non prévu","nicht geplant","予定なし","계획 없음","未计划","غير مخطط"],
+      withinPlan:["You’re within your plan across all planned categories. Keep it up!","திட்டமிட்ட அனைத்து வகைகளிலும் செலவு கட்டுப்பாட்டில் உள்ளது. தொடருங்கள்!","आप सभी नियोजित श्रेणियों में बजट के भीतर हैं। ऐसे ही जारी रखें!","అన్ని ప్రణాళికా వర్గాల్లో మీరు బడ్జెట్‌లోనే ఉన్నారు. కొనసాగించండి!","എല്ലാ പദ്ധതിയിട്ട വിഭാഗങ്ങളിലും ചെലവ് പരിധിക്കുള്ളിലാണ്. തുടരൂ!","ಎಲ್ಲಾ ಯೋಜಿತ ವರ್ಗಗಳಲ್ಲಿ ನೀವು ಬಜೆಟ್ ಒಳಗಿದ್ದೀರಿ. ಮುಂದುವರಿಸಿ!","সব পরিকল্পিত বিভাগে আপনি বাজেটের মধ্যে আছেন। চালিয়ে যান!","सर्व नियोजित श्रेणींमध्ये तुम्ही बजेटमध्ये आहात. असेच सुरू ठेवा!","Estás dentro del presupuesto en todas las categorías. ¡Sigue así!","Vous respectez le budget dans toutes les catégories. Continuez !","Sie liegen in allen geplanten Kategorien im Budget. Weiter so!","すべてのカテゴリで予算内です。その調子です！","모든 계획 카테고리에서 예산을 지키고 있어요. 계속하세요!","أنت ضمن الميزانية في جميع الفئات المخطط لها. أحسنت!","أنت ضمن الميزانية في جميع الفئات المخطط لها. أحسنت!"],
+      overBudget:["You planned {planned} for {category}, spent {actual} — over by {over}.","{category}க்கு {planned} திட்டமிட்டீர்கள், {actual} செலவிட்டீர்கள் — {over} அதிகம்.","{category} के लिए {planned} तय किए, {actual} खर्च हुए — {over} अधिक।","{category} కోసం {planned} అనుకున్నారు, {actual} ఖర్చు చేశారు — {over} మించిపోయింది.","{category}യ്ക്ക് {planned} നിശ്ചയിച്ചു, {actual} ചെലവാക്കി — {over} അധികം.","{category}ಗೆ {planned} ಯೋಜಿಸಿ, {actual} ವೆಚ್ಚವಾಯಿತು — {over} ಹೆಚ್ಚು.","{category}-এর জন্য {planned} পরিকল্পনা, খরচ {actual} — {over} বেশি।","{category} साठी {planned} नियोजित, {actual} खर्च — {over} जास्त.","Planeaste {planned} para {category}, gastaste {actual}: {over} de más.","Vous aviez prévu {planned} pour {category}, dépensé {actual} : {over} de trop.","Für {category} waren {planned} geplant, ausgegeben wurden {actual} – {over} mehr.","{category}の予算は{planned}、支出は{actual}、超過は{over}です。","{category} 계획은 {planned}, 지출은 {actual}으로 {over} 초과했어요.","{category}计划 {planned}，支出 {actual}，超出 {over}。","خططتَ لـ {planned} لفئة {category}، وأنفقتَ {actual} — تجاوزتَ {over}."],
+      incomeSavings:["Income & savings","வருமானம் மற்றும் சேமிப்பு","आय और बचत","ఆదాయం మరియు పొదుపు","വരുമാനവും സമ്പാദ്യവും","ಆದಾಯ ಮತ್ತು ಉಳಿತಾಯ","আয় ও সঞ্চয়","उत्पन्न आणि बचत","Ingresos y ahorro","Revenus et épargne","Einnahmen und Ersparnisse","収入と貯蓄","수입 및 저축","收入与储蓄","الدخل والادخار"],
+      incomeSubtitle:["Make room for what matters","முக்கியமானவற்றுக்கு இடமளிக்கவும்","ज़रूरी चीज़ों के लिए जगह बनाएं","ముఖ్యమైన వాటికి చోటు కల్పించండి","പ്രധാന കാര്യങ്ങൾക്ക് ഇടം നൽകൂ","ಮುಖ್ಯವಾದುದಕ್ಕೆ ಜಾಗ ಮಾಡಿ","গুরুত্বপূর্ণ বিষয়ের জন্য জায়গা রাখুন","महत्त्वाच्या गोष्टींसाठी जागा ठेवा","Haz espacio para lo importante","Faites place à l’essentiel","Schaffen Sie Platz für das Wesentliche","大切なもののために","중요한 것을 위한 여유를 만드세요","为重要事项留出空间","خصص مساحة لما يهم"],
+      addIncome:["＋ Add income","＋ வருமானத்தைச் சேர்","＋ आय जोड़ें","＋ ఆదాయాన్ని జోడించండి","＋ വരുമാനം ചേർക്കുക","＋ ಆದಾಯ ಸೇರಿಸಿ","＋ আয় যোগ করুন","＋ उत्पन्न जोडा","＋ Añadir ingreso","＋ Ajouter un revenu","＋ Einnahme hinzufügen","＋ 収入を追加","＋ 수입 추가","＋ 添加收入","＋ إضافة دخل"],
+      salary:["Salary","சம்பளம்","वेतन","జీతం","ശമ്പളം","ಸಂಬಳ","বেতন","पगार","Salario","Salaire","Gehalt","給与","급여","工资","راتب"],
+      otherIncome:["Other income","பிற வருமானம்","अन्य आय","ఇతర ఆదాయం","മറ്റ് വരുമാനം","ಇತರೆ ಆದಾಯ","অন্যান্য আয়","इतर उत्पन्न","Otros ingresos","Autres revenus","Sonstige Einnahmen","その他の収入","기타 수입","其他收入","دخل آخر"],
+      salaryRecorded:["Recorded salary income","பதிவு செய்யப்பட்ட சம்பள வருமானம்","दर्ज वेतन आय","నమోదైన జీత ఆదాయం","രേഖപ്പെടുത്തിയ ശമ്പള വരുമാനം","ದಾಖಲಾದ ಸಂಬಳ ಆದಾಯ","নথিভুক্ত বেতন আয়","नोंदवलेले पगाराचे उत्पन्न","Ingresos salariales registrados","Revenus salariaux enregistrés","Erfasstes Gehalt","記録済みの給与収入","기록된 급여 수입","已记录工资收入","دخل الراتب المسجل"],
+      otherRecorded:["Gifts, reimbursements, more","பரிசுகள், திருப்பிச் செலுத்தல்கள் மற்றும் பிற","उपहार, प्रतिपूर्ति और अन्य","బహుమతులు, రీయింబర్స్‌మెంట్‌లు మొదలైనవి","സമ്മാനങ്ങൾ, തിരിച്ചടവുകൾ തുടങ്ങിയവ","ಉಡುಗೊರೆಗಳು, ಮರುಪಾವತಿಗಳು ಮತ್ತು ಇತರೆ","উপহার, ফেরত ও অন্যান্য","भेटवस्तू, परतावा आणि इतर","Regalos, reembolsos y más","Cadeaux, remboursements et plus","Geschenke, Erstattungen und mehr","贈与、払い戻しなど","선물, 환급 등","礼金、报销等","هدايا واستردادات وغيرها"],
+      total:["Total","மொத்தம்","कुल","మొత్తం","ആകെ","ಒಟ್ಟು","মোট","एकूण","Total","Total","Gesamt","合計","합계","总计","الإجمالي"],
+      expensesByCategory:["Expenses by category","வகைப்படி செலவுகள்","श्रेणी के अनुसार खर्च","వర్గం వారీగా ఖర్చులు","വിഭാഗം തിരിച്ചുള്ള ചെലവുകൾ","ವರ್ಗವಾರು ವೆಚ್ಚಗಳು","বিভাগ অনুযায়ী খরচ","श्रेणीनुसार खर्च","Gastos por categoría","Dépenses par catégorie","Ausgaben nach Kategorie","カテゴリ別支出","카테고리별 지출","分类支出","المصروفات حسب الفئة"],
+      categoryChartSubtitle:["Where your money goes","உங்கள் பணம் எங்கு செல்கிறது","आपका पैसा कहाँ जाता है","మీ డబ్బు ఎక్కడ ఖర్చవుతోంది","നിങ്ങളുടെ പണം എവിടെ പോകുന്നു","ನಿಮ್ಮ ಹಣ ಎಲ್ಲಿಗೆ ಹೋಗುತ್ತದೆ","আপনার অর্থ কোথায় যায়","तुमचे पैसे कुठे जातात","A dónde va tu dinero","Où va votre argent","Wohin Ihr Geld fließt","お金の使い道","내 돈이 어디로 가는지","资金流向","أين تذهب أموالك"],
+      totalSpent:["Total spent","மொத்தம் செலவிட்டது","कुल खर्च","మొత్తం ఖర్చు","ആകെ ചെലവായത്","ಒಟ್ಟು ವೆಚ್ಚ","মোট খরচ","एकूण खर्च","Total gastado","Total dépensé","Insgesamt ausgegeben","支出合計","총 지출","总支出","إجمالي الإنفاق"],
+      incomeVsExpenses:["Income vs expenses","வருமானம் மற்றும் செலவுகள்","आय बनाम खर्च","ఆదాయం vs ఖర్చులు","വരുമാനം vs ചെലവുകൾ","ಆದಾಯ ಮತ್ತು ವೆಚ್ಚಗಳು","আয় বনাম খরচ","उत्पन्न विरुद्ध खर्च","Ingresos vs gastos","Revenus vs dépenses","Einnahmen und Ausgaben","収入と支出","수입 대비 지출","收入与支出","الدخل مقابل المصروفات"],
+      monthlyCashFlow:["Monthly cash flow","மாதாந்திர பணப்புழக்கம்","मासिक नकदी प्रवाह","నెలవారీ నగదు ప్రవాహం","പ്രതിമാസ പണപ്രവാഹം","ಮಾಸಿಕ ಹಣದ ಹರಿವು","মাসিক নগদ প্রবাহ","मासिक रोख प्रवाह","Flujo de caja mensual","Flux de trésorerie mensuel","Monatlicher Geldfluss","月ごとの収支","월별 현금 흐름","每月现金流","التدفق النقدي الشهري"],
+      dailySpendingTrend:["Daily spending trend","தினசரி செலவுப் போக்கு","दैनिक खर्च का रुझान","రోజువారీ ఖర్చుల ధోరణి","പ്രതിദിന ചെലവിന്റെ പ്രവണത","ದೈನಂದಿನ ವೆಚ್ಚದ ಪ್ರವೃತ್ತಿ","দৈনিক খরচের প্রবণতা","दैनिक खर्चाचा कल","Tendencia diaria de gastos","Tendance quotidienne des dépenses","Täglicher Ausgabentrend","毎日の支出推移","일일 지출 추이","每日支出趋势","اتجاه الإنفاق اليومي"],
+      last14Days:["Your last 14 days","கடந்த 14 நாட்கள்","पिछले 14 दिन","గత 14 రోజులు","കഴിഞ്ഞ 14 ദിവസം","ಕಳೆದ 14 ದಿನಗಳು","গত ১৪ দিন","मागील १४ दिवस","Tus últimos 14 días","Vos 14 derniers jours","Ihre letzten 14 Tage","過去14日間","최근 14일","过去14天","آخر 14 يومًا"],
+      planVsActual:["Plan vs actual","திட்டம் மற்றும் உண்மை","योजना बनाम वास्तविक","ప్రణాళిక vs వాస్తవం","പദ്ധതി vs യഥാർത്ഥം","ಯೋಜನೆ ಮತ್ತು ವಾಸ್ತವ","পরিকল্পনা বনাম প্রকৃত","नियोजन विरुद्ध प्रत्यक्ष","Plan vs real","Prévu vs réel","Plan vs. tatsächlich","予算と実績","계획 대비 실제","计划与实际","المخطط مقابل الفعلي"],
+      byCategory:["By category","வகைப்படி","श्रेणी के अनुसार","వర్గం వారీగా","വിഭാഗം പ്രകാരം","ವರ್ಗದಂತೆ","বিভাগ অনুযায়ী","श्रेणीनुसार","Por categoría","Par catégorie","Nach Kategorie","カテゴリ別","카테고리별","按类别","حسب الفئة"],
+      planned:["Planned","திட்டமிடப்பட்டது","नियोजित","ప్రణాళిక","ആസൂത്രണം ചെയ്തത്","ಯೋಜಿತ","পরিকল্পিত","नियोजित","Planificado","Prévu","Geplant","予定","계획","计划","المخطط"],
+      actual:["Actual","உண்மை","वास्तविक","వాస్తవం","യഥാർത്ഥം","ವಾಸ್ತವ","প্রকৃত","प्रत्यक्ष","Real","Réel","Tatsächlich","実績","실제","实际","الفعلي"],
+      fullHistory:["Full history","முழு வரலாறு","पूरा इतिहास","పూర్తి చరిత్ర","മുഴുവൻ ചരിത്രം","ಪೂರ್ಣ ಇತಿಹಾಸ","সম্পূর্ণ ইতিহাস","संपूर्ण इतिहास","Historial completo","Historique complet","Gesamter Verlauf","すべての履歴","전체 기록","完整历史","السجل الكامل"],
+      allRecords:["All your plans, expenses, and income","உங்கள் அனைத்து திட்டங்கள், செலவுகள் மற்றும் வருமானம்","आपकी सभी योजनाएँ, खर्च और आय","మీ అన్ని ప్రణాళికలు, ఖర్చులు మరియు ఆదాయం","നിങ്ങളുടെ എല്ലാ പദ്ധതികളും ചെലവുകളും വരുമാനവും","ನಿಮ್ಮ ಎಲ್ಲಾ ಯೋಜನೆಗಳು, ವೆಚ್ಚಗಳು ಮತ್ತು ಆದಾಯ","আপনার সব পরিকল্পনা, খরচ ও আয়","तुमचे सर्व नियोजन, खर्च आणि उत्पन्न","Todos tus planes, gastos e ingresos","Tous vos projets, dépenses et revenus","Alle Planungen, Ausgaben und Einnahmen","すべての予定、支出、収入","모든 계획, 지출 및 수입","所有计划、支出和收入","كل خططك ومصروفاتك ودخلك"],
+      searchHistory:["Search your history...","உங்கள் வரலாற்றைத் தேடுங்கள்...","अपने इतिहास में खोजें...","మీ చరిత్రలో వెతకండి...","ചരിത്രത്തിൽ തിരയുക...","ನಿಮ್ಮ ಇತಿಹಾಸವನ್ನು ಹುಡುಕಿ...","আপনার ইতিহাসে খুঁজুন...","इतिहासात शोधा...","Buscar en el historial...","Rechercher dans l’historique...","Verlauf durchsuchen...","履歴を検索...","기록 검색...","搜索历史...","ابحث في السجل..."],
+      everything:["Everything","அனைத்தும்","सब कुछ","అన్నీ","എല്ലാം","ಎಲ್ಲವೂ","সবকিছু","सर्व","Todo","Tout","Alles","すべて","전체","全部","الكل"],
+      plannings:["Plannings","திட்டங்கள்","योजनाएँ","ప్రణాళికలు","പദ്ധതികൾ","ಯೋಜನೆಗಳು","পরিকল্পনা","नियोजन","Planes","Projets","Planungen","予定","계획","计划","الخطط"],
+      expenses:["Expenses","செலவுகள்","खर्च","ఖర్చులు","ചെലവുകൾ","ವೆಚ್ಚಗಳು","খরচ","खर्च","Gastos","Dépenses","Ausgaben","支出","지출","支出","المصروفات"],
+      income:["Income","வருமானம்","आय","ఆదాయం","വരുമാനം","ಆದಾಯ","আয়","उत्पन्न","Ingresos","Revenus","Einnahmen","収入","수입","收入","الدخل"],
+      noHistory:["No history found for these filters.","இந்த வடிகட்டிகளுக்கு வரலாறு இல்லை.","इन फ़िल्टरों के लिए कोई इतिहास नहीं मिला।","ఈ ఫిల్టర్‌లకు చరిత్ర కనుగొనబడలేదు.","ഈ ഫിൽട്ടറുകൾക്ക് ചരിത്രമൊന്നും കണ്ടെത്തിയില്ല.","ಈ ಫಿಲ್ಟರ್‌ಗಳಿಗೆ ಇತಿಹಾಸ ಕಂಡುಬಂದಿಲ್ಲ.","এই ফিল্টারে কোনো ইতিহাস পাওয়া যায়নি।","या फिल्टरसाठी इतिहास आढळला नाही.","No hay historial para estos filtros.","Aucun historique pour ces filtres.","Für diese Filter wurde kein Verlauf gefunden.","条件に一致する履歴はありません。","필터에 맞는 기록이 없습니다.","未找到符合筛选条件的历史记录。","لا يوجد سجل لهذه التصفية."],
+      titleField:["Title","தலைப்பு","शीर्षक","శీర్షిక","തലക്കെട്ട്","ಶೀರ್ಷಿಕೆ","শিরোনাম","शीर्षक","Título","Titre","Titel","タイトル","제목","标题","العنوان"],
+      amountField:["Amount (₹)","தொகை (₹)","राशि (₹)","మొత్తం (₹)","തുക (₹)","ಮೊತ್ತ (₹)","পরিমাণ (₹)","रक्कम (₹)","Importe","Montant","Betrag","金額","금액","金额","المبلغ"],
+      plannedAmountField:["Planned amount (₹)","திட்டமிட்ட தொகை (₹)","नियोजित राशि (₹)","ప్రణాళిక మొత్తం (₹)","ആസൂത്രിത തുക (₹)","ಯೋಜಿತ ಮೊತ್ತ (₹)","পরিকল্পিত পরিমাণ (₹)","नियोजित रक्कम (₹)","Importe previsto","Montant prévu","Geplanter Betrag","予定金額","계획 금액","计划金额","المبلغ المخطط"],
+      categoryField:["Category","வகை","श्रेणी","వర్గం","വിഭാഗം","ವರ್ಗ","বিভাগ","श्रेणी","Categoría","Catégorie","Kategorie","カテゴリ","카테고리","类别","الفئة"],
+      plannedDateField:["Planned date","திட்டமிட்ட தேதி","नियोजित तिथि","ప్రణాళిక తేదీ","ആസൂത്രിത തീയതി","ಯೋಜಿತ ದಿನಾಂಕ","পরিকল্পিত তারিখ","नियोजित तारीख","Fecha prevista","Date prévue","Geplantes Datum","予定日","예정일","计划日期","التاريخ المخطط"],
+      dateField:["Date","தேதி","तिथि","తేదీ","തീയതി","ದಿನಾಂಕ","তারিখ","तारीख","Fecha","Date","Datum","日付","날짜","日期","التاريخ"],
+      timeField:["Time","நேரம்","समय","సమయం","സമയം","ಸಮಯ","সময়","वेळ","Hora","Heure","Uhrzeit","時刻","시간","时间","الوقت"],
+      paymentMethodField:["Payment method","கட்டண முறை","भुगतान का तरीका","చెల్లింపు విధానం","പണമടയ്ക്കൽ രീതി","ಪಾವತಿ ವಿಧಾನ","পেমেন্ট পদ্ধতি","पेमेंट पद्धत","Método de pago","Mode de paiement","Zahlungsmethode","支払方法","결제 수단","付款方式","طريقة الدفع"],
+      noteField:["Note","குறிப்பு","नोट","గమనిక","കുറിപ്പ്","ಟಿಪ್ಪಣಿ","নোট","नोंद","Nota","Note","Notiz","メモ","메모","备注","ملاحظة"],
+      incomeType:["Income type","வருமான வகை","आय का प्रकार","ఆదాయ రకం","വരുമാന തരം","ಆದಾಯದ ಪ್ರಕಾರ","আয়ের ধরন","उत्पन्नाचा प्रकार","Tipo de ingreso","Type de revenu","Einnahmeart","収入の種類","수입 유형","收入类型","نوع الدخل"],
+      sourcePerson:["Source person name","பெறப்பட்ட நபரின் பெயர்","किससे मिला","ఎవరి నుండి అందింది","ആരിൽ നിന്ന് ലഭിച്ചു","ಯಾರಿಂದ ಸ್ವೀಕರിച്ചു","কার কাছ থেকে পেয়েছেন","कोणाकडून मिळाले","Nombre de quien lo entrega","Nom de la personne source","Name der Quelle","受取人の名前","받은 사람 이름","来源人姓名","اسم مصدر الدخل"],
+      reason:["Reason","காரணம்","कारण","కారణం","കാരണം","ಕಾರಣ","কারণ","कारण","Motivo","Motif","Grund","理由","사유","原因","السبب"],
+      salaryMonth:["Month","மாதம்","महीना","నెల","മാസം","ತಿಂಗಳು","মাস","महिना","Mes","Mois","Monat","月","월","月份","الشهر"],
+      paymentCash:["Cash","ரொக்கம்","नकद","నగదు","പണം","ನಗದು","নগদ","रोख","Efectivo","Espèces","Bargeld","現金","현금","现金","نقدًا"],
+      paymentUpi:["UPI","UPI","UPI","UPI","UPI","UPI","UPI","UPI","UPI","UPI","UPI","UPI","UPI","UPI","UPI"],
+      paymentCard:["Card","அட்டை","कार्ड","కార్డ్","കാർഡ്","ಕಾರ್ಡ್","কার্ড","कार्ड","Tarjeta","Carte","Karte","カード","카드","银行卡","بطاقة"],
+      paymentBank:["Bank","வங்கி","बैंक","బ్యాంక్","ബാങ്ക്","ಬ್ಯಾಂಕ್","ব্যাংক","बँक","Banco","Banque","Bank","銀行","은행","银行","بنك"],
+      save:["Save","சேமி","सहेजें","సేవ్ చేయండి","സേവ് ചെയ്യുക","ಉಳಿಸಿ","সংরক্ষণ","जतन करा","Guardar","Enregistrer","Speichern","保存","저장","保存","حفظ"],
+      cancel:["Cancel","ரத்துசெய்","रद्द करें","రద్దు చేయండి","റദ്ദാക്കുക","ರದ್ದುಮಾಡಿ","বাতিল","रद्द करा","Cancelar","Annuler","Abbrechen","キャンセル","취소","取消","إلغاء"],
+      close:["Close","மூடு","बंद करें","మూసివేయండి","അടയ്ക്കുക","ಮುಚ್ಚಿ","বন্ধ করুন","बंद करा","Cerrar","Fermer","Schließen","閉じる","닫기","关闭","إغلاق"],
+      editPlan:["Edit planning","திட்டத்தைத் திருத்து","योजना संपादित करें","ప్రణాళికను సవరించండి","പദ്ധതി തിരുത്തുക","ಯೋಜನೆಯನ್ನು ಸಂಪಾದಿಸಿ","পরিকল্পনা সম্পাদনা","नियोजन संपादित करा","Editar plan","Modifier le projet","Planung bearbeiten","予定を編集","계획 수정","编辑计划","تعديل الخطة"],
+      addPlanTitle:["Add a planning","புதிய திட்டம்","योजना जोड़ें","ప్రణాళికను జోడించండి","പദ്ധതി ചേർക്കുക","ಯೋಜನೆ ಸೇರಿಸಿ","পরিকল্পনা যোগ করুন","नियोजन जोडा","Añadir un plan","Ajouter un projet","Planung hinzufügen","予定を追加","계획 추가","添加计划","إضافة خطة"],
+      editExpense:["Edit expense","செலவைத் திருத்து","खर्च संपादित करें","ఖర్చును సవరించండి","ചെലവ് തിരുത്തുക","ವೆಚ್ಚ ಸಂಪಾದಿಸಿ","খরচ সম্পাদনা","खर्च संपादित करा","Editar gasto","Modifier la dépense","Ausgabe bearbeiten","支出を編集","지출 수정","编辑支出","تعديل المصروف"],
+      addExpenseTitle:["Add an expense","புதிய செலவு","खर्च जोड़ें","ఖర్చును జోడించండి","ചെലവ് ചേർക്കുക","ವೆಚ್ಚ ಸೇರಿಸಿ","খরচ যোগ করুন","खर्च जोडा","Añadir un gasto","Ajouter une dépense","Ausgabe hinzufügen","支出を追加","지출 추가","添加支出","إضافة مصروف"],
+      editIncome:["Edit income","வருமானத்தைத் திருத்து","आय संपादित करें","ఆదాయాన్ని సవరించండి","വരുമാനം തിരുത്തുക","ಆದಾಯ ಸಂಪಾದಿಸಿ","আয় সম্পাদনা","उत्पन्न संपादित करा","Editar ingreso","Modifier le revenu","Einnahme bearbeiten","収入を編集","수입 수정","编辑收入","تعديل الدخل"],
+      addIncomeTitle:["Add income","வருமானத்தைச் சேர்","आय जोड़ें","ఆదాయాన్ని జోడించండి","വരുമാനം ചേർക്കുക","ಆದಾಯ ಸೇರಿಸಿ","আয় যোগ করুন","उत्पन्न जोडा","Añadir ingreso","Ajouter un revenu","Einnahme hinzufügen","収入を追加","수입 추가","添加收入","إضافة دخل"],
+      expenseDetails:["Expense details","செலவு விவரங்கள்","खर्च का विवरण","ఖర్చు వివరాలు","ചെലവിന്റെ വിശദാംശങ്ങൾ","ವೆಚ್ಚದ ವಿವರಗಳು","খরচের বিবরণ","खर्चाचा तपशील","Detalles del gasto","Détails de la dépense","Ausgabendetails","支出の詳細","지출 세부 정보","支出详情","تفاصيل المصروف"],
+      dateTime:["Date & time","தேதி மற்றும் நேரம்","तिथि और समय","తేదీ మరియు సమయం","തീയതിയും സമയവും","ದಿನಾಂಕ ಮತ್ತು ಸಮಯ","তারিখ ও সময়","तारीख आणि वेळ","Fecha y hora","Date et heure","Datum und Uhrzeit","日時","날짜 및 시간","日期和时间","التاريخ والوقت"],
+      edit:["Edit","திருத்து","संपादित करें","సవరించండి","തിരുത്തുക","ಸಂಪಾದಿಸಿ","সম্পাদনা","संपादित करा","Editar","Modifier","Bearbeiten","編集","수정","编辑","تعديل"],
+      delete:["Delete","நீக்கு","हटाएँ","తొలగించండి","ഇല്ലാതാക്കുക","ಅಳಿಸಿ","মুছুন","हटवा","Eliminar","Supprimer","Löschen","削除","삭제","删除","حذف"],
+      deleteConfirm:["Delete this item? This cannot be undone.","இந்த உருப்படியை நீக்கவா? இதை மீட்டெடுக்க முடியாது.","यह आइटम हटाएँ? इसे वापस नहीं किया जा सकता।","ఈ అంశాన్ని తొలగించాలా? తిరిగి పొందలేరు.","ഈ ഇനം ഇല്ലാതാക്കണോ? ഇത് തിരികെ ലഭിക്കില്ല.","ಈ ಐಟಂ ಅಳಿಸಬೇಕೇ? ಇದನ್ನು ಮರಳಿ ಪಡೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ.","এই আইটেমটি মুছবেন? এটি ফেরানো যাবে না।","हा आयटम हटवायचा? हे पूर्ववत करता येणार नाही.","¿Eliminar este elemento? No se puede deshacer.","Supprimer cet élément ? Cette action est irréversible.","Diesen Eintrag löschen? Dies kann nicht rückgängig gemacht werden.","この項目を削除しますか？元に戻せません。","이 항목을 삭제할까요? 되돌릴 수 없습니다.","确定删除此项？此操作无法撤销。","هل تريد حذف هذا العنصر؟ لا يمكن التراجع عن ذلك."],
+      itemDeleted:["Item deleted.","உருப்படி நீக்கப்பட்டது.","आइटम हटा दिया गया।","అంశం తొలగించబడింది.","ഇനം ഇല്ലാതാക്കി.","ಐಟಂ ಅಳಿಸಲಾಗಿದೆ.","আইটেম মুছে ফেলা হয়েছে।","आयटम हटवला.","Elemento eliminado.","Élément supprimé.","Eintrag gelöscht.","項目を削除しました。","항목이 삭제되었습니다.","项目已删除。","تم حذف العنصر."],
+      chooseCategory:["Choose a category to continue.","தொடர ஒரு வகையைத் தேர்ந்தெடுக்கவும்.","जारी रखने के लिए श्रेणी चुनें।","కొనసాగించడానికి వర్గాన్ని ఎంచుకోండి.","തുടരാൻ ഒരു വിഭാഗം തിരഞ്ഞെടുക്കൂ.","ಮುಂದುವರಿಸಲು ವರ್ಗ ಆಯ್ಕೆಮಾಡಿ.","চালিয়ে যেতে একটি বিভাগ বেছে নিন।","पुढे जाण्यासाठी श्रेणी निवडा.","Elige una categoría para continuar.","Choisissez une catégorie pour continuer.","Wählen Sie eine Kategorie aus.","カテゴリを選択してください。","계속하려면 카테고리를 선택하세요.","请选择类别以继续。","اختر فئة للمتابعة."],
+      categoryNamePrompt:["Category name","வகையின் பெயர்","श्रेणी का नाम","వర్గం పేరు","വിഭാഗത്തിന്റെ പേര്","ವರ್ಗದ ಹೆಸರು","বিভাগের নাম","श्रेणीचे नाव","Nombre de categoría","Nom de la catégorie","Kategoriename","カテゴリ名","카테고리 이름","类别名称","اسم الفئة"],
+      colorPrompt:["Choose a color (hex code, for example #7c6de0)","நிறத்தைத் தேர்ந்தெடுக்கவும் (உதா: #7c6de0)","रंग चुनें (जैसे #7c6de0)","రంగును ఎంచుకోండి (ఉదా. #7c6de0)","നിറം തിരഞ്ഞെടുക്കുക (ഉദാ: #7c6de0)","ಬಣ್ಣ ಆಯ್ಕೆಮಾಡಿ (ಉದಾ: #7c6de0)","রং বেছে নিন (যেমন #7c6de0)","रंग निवडा (उदा. #7c6de0)","Elige un color (código HEX, p. ej. #7c6de0)","Choisissez une couleur (code HEX, ex. #7c6de0)","Farbe wählen (Hex-Code, z. B. #7c6de0)","色を選択（例：#7c6de0）","색상을 선택하세요 (예: #7c6de0)","选择颜色（十六进制，例如 #7c6de0）","اختر لونًا (رمز hex مثل #7c6de0)"],
+      iconPrompt:["Choose an emoji or icon","ஈமோஜி அல்லது குறியீட்டைத் தேர்ந்தெடுக்கவும்","इमोजी या आइकन चुनें","ఎమోజీ లేదా చిహ్నాన్ని ఎంచుకోండి","ഇമോജിയോ ഐക്കണോ തിരഞ്ഞെടുക്കുക","ಎಮೋಜಿ ಅಥವಾ ಐಕಾನ್ ಆಯ್ಕೆಮಾಡಿ","ইমোজি বা আইকন বেছে নিন","इमोजी किंवा चिन्ह निवडा","Elige un emoji o icono","Choisissez un emoji ou une icône","Emoji oder Symbol wählen","絵文字またはアイコンを選択","이모지 또는 아이콘 선택","选择表情或图标","اختر رمزًا تعبيريًا أو أيقونة"],
+      noDate:["No date","தேதி இல்லை","कोई तारीख नहीं","తేదీ లేదు","തീയതിയില്ല","ದಿನಾಂಕವಿಲ್ಲ","তারিখ নেই","तारीख नाही","Sin fecha","Sans date","Kein Datum","日付なし","날짜 없음","无日期","بلا تاريخ"],
+      of:["of","இல்","में से","లో","ൽ","ರಲ್ಲಿ","এর মধ্যে","पैकी","de","sur","von","中","중","共","من"],
+      toggleTheme:["Toggle color theme","வண்ணத் தோற்றத்தை மாற்று","रंग थीम बदलें","రంగు థీమ్‌ను మార్చండి","നിറ തീം മാറ്റുക","ಬಣ್ಣದ ಥೀಮ್ ಬದಲಿಸಿ","রঙের থিম বদলান","रंग थीम बदला","Cambiar tema de color","Changer le thème","Farbschema umschalten","配色テーマを切り替え","색상 테마 전환","切换颜色主题","تبديل السمة"],
+      duplicateCategory:["That category already exists.","அந்த வகை ஏற்கனவே உள்ளது.","यह श्रेणी पहले से मौजूद है।","ఆ వర్గం ఇప్పటికే ఉంది.","ആ വിഭാഗം ഇതിനകം നിലവിലുണ്ട്.","ಆ ವರ್ಗ ಈಗಾಗಲೇ ಇದೆ.","এই বিভাগটি ইতিমধ্যে আছে।","ही श्रेणी आधीपासून आहे.","Esa categoría ya existe.","Cette catégorie existe déjà.","Diese Kategorie gibt es bereits.","このカテゴリは既にあります。","이미 존재하는 카테고리입니다.","该类别已存在。","هذه الفئة موجودة بالفعل."],
+      createCategory:["＋ Create a category","＋ புதிய வகையை உருவாக்கு","＋ श्रेणी बनाएँ","＋ వర్గాన్ని సృష్టించండి","＋ വിഭാഗം സൃഷ്ടിക്കുക","＋ ವರ್ಗ ರಚಿಸಿ","＋ বিভাগ তৈরি করুন","＋ श्रेणी तयार करा","＋ Crear categoría","＋ Créer une catégorie","＋ Kategorie erstellen","＋ カテゴリを作成","＋ 카테고리 만들기","＋ 创建类别","＋ إنشاء فئة"],
+      emptyCategoryChart:["Add expenses to see your category breakdown.","வகை வாரியான செலவைக் காண செலவுகளைச் சேர்க்கவும்.","श्रेणी के अनुसार खर्च देखने के लिए खर्च जोड़ें।","వర్గాల వారీగా ఖర్చు చూడడానికి ఖర్చులను జోడించండి.","വിഭാഗ തിരിച്ചുള്ള ചെലവ് കാണാൻ ചെലവുകൾ ചേർക്കൂ.","ವರ್ಗವಾರು ವೆಚ್ಚ ನೋಡಲು ವೆಚ್ಚಗಳನ್ನು ಸೇರಿಸಿ.","বিভাগভিত্তিক খরচ দেখতে খরচ যোগ করুন।","श्रेणीनुसार खर्च पाहण्यासाठी खर्च जोडा.","Añade gastos para ver el desglose por categoría.","Ajoutez des dépenses pour voir la répartition.","Fügen Sie Ausgaben hinzu, um die Aufteilung zu sehen.","カテゴリ別の支出を見るには支出を追加してください。","카테고리별 내역을 보려면 지출을 추가하세요.","添加支出以查看类别明细。","أضف مصروفات لعرض تفاصيل الفئات."],
+      emptyPlanChart:["Add plans and expenses to compare categories.","வகைகளை ஒப்பிட திட்டங்களையும் செலவுகளையும் சேர்க்கவும்.","श्रेणियों की तुलना के लिए योजनाएँ और खर्च जोड़ें।","వర్గాలను పోల్చడానికి ప్రణాళికలు మరియు ఖర్చులు జోడించండి.","വിഭാഗങ്ങൾ താരതമ്യം ചെയ്യാൻ പദ്ധതികളും ചെലവുകളും ചേർക്കൂ.","ವರ್ಗಗಳನ್ನು ಹೋಲಿಸಲು ಯೋಜನೆ ಮತ್ತು ವೆಚ್ಚಗಳನ್ನು ಸೇರಿಸಿ.","বিভাগ তুলনা করতে পরিকল্পনা ও খরচ যোগ করুন।","श्रेणींची तुलना करण्यासाठी नियोजन आणि खर्च जोडा.","Añade planes y gastos para comparar categorías.","Ajoutez des plans et dépenses pour comparer.","Fügen Sie Planungen und Ausgaben zum Vergleich hinzu.","カテゴリを比較するには予定と支出を追加してください。","카테고리 비교를 위해 계획과 지출을 추가하세요.","添加计划和支出以比较类别。","أضف الخطط والمصروفات لمقارنة الفئات."],
+      languageSaveError:["Language setting could not be saved.","மொழி அமைப்பைச் சேமிக்க முடியவில்லை.","भाषा सेटिंग सहेजी नहीं जा सकी।","భాష సెట్టింగ్‌ను సేవ్ చేయలేకపోయాం.","ഭാഷാ ക്രമീകരണം സംരക്ഷിക്കാനായില്ല.","ಭಾಷೆಯ ಸೆಟ್ಟಿಂಗ್ ಉಳಿಸಲಾಗಲಿಲ್ಲ.","ভাষার সেটিং সংরক্ষণ করা যায়নি।","भाषा सेटिंग जतन करता आली नाही.","No se pudo guardar el idioma.","Impossible d’enregistrer la langue.","Spracheinstellung konnte nicht gespeichert werden.","言語設定を保存できませんでした。","언어 설정을 저장하지 못했습니다.","无法保存语言设置。","تعذر حفظ إعداد اللغة."],
+      storageError:["Could not save your data. Check available device storage and try again.","தரவைச் சேமிக்க முடியவில்லை. சாதன சேமிப்பிடத்தைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.","डेटा सहेजा नहीं जा सका। डिवाइस स्टोरेज जाँचें और फिर प्रयास करें।","డేటాను సేవ్ చేయలేకపోయాం. పరికర నిల్వను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.","ഡാറ്റ സംരക്ഷിക്കാനായില്ല. ഉപകരണ സംഭരണം പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.","ಡೇಟಾ ಉಳಿಸಲಾಗಲಿಲ್ಲ. ಸಾಧನದ ಸಂಗ್ರಹಣೆ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.","ডেটা সংরক্ষণ করা যায়নি। ডিভাইসের স্টোরেজ পরীক্ষা করে আবার চেষ্টা করুন।","डेटा जतन करता आले नाही. डिव्हाइस स्टोरेज तपासून पुन्हा प्रयत्न करा.","No se pudieron guardar los datos. Comprueba el almacenamiento.","Impossible d’enregistrer. Vérifiez le stockage disponible.","Daten konnten nicht gespeichert werden. Speicher prüfen.","データを保存できません。空き容量を確認してください。","데이터를 저장할 수 없습니다. 저장 공간을 확인하세요.","无法保存数据，请检查设备存储空间。","تعذر حفظ البيانات. تحقق من مساحة التخزين."],
+      dataReadError:["Saved data could not be read. Your existing data has not been changed.","சேமித்த தரவைப் படிக்க முடியவில்லை. இருக்கும் தரவு மாற்றப்படவில்லை.","सहेजा गया डेटा पढ़ा नहीं जा सका। मौजूदा डेटा नहीं बदला गया है।","సేవ్ చేసిన డేటాను చదవలేకపోయాం. ఇప్పటికే ఉన్న డేటా మార్చలేదు.","സംരക്ഷിച്ച ഡാറ്റ വായിക്കാനായില്ല. നിലവിലെ ഡാറ്റ മാറ്റിയിട്ടില്ല.","ಉಳಿಸಿದ ಡೇಟಾವನ್ನು ಓದಲಾಗಲಿಲ್ಲ. ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ ಡೇಟಾ ಬದಲಾಗಿಲ್ಲ.","সংরক্ষিত ডেটা পড়া যায়নি। বিদ্যমান ডেটা পরিবর্তন করা হয়নি।","जतन केलेला डेटा वाचता आला नाही. विद्यमान डेटा बदललेला नाही.","No se pudieron leer los datos guardados. No se modificaron.","Impossible de lire les données. Vos données existantes sont intactes.","Gespeicherte Daten konnten nicht gelesen werden. Vorhandene Daten bleiben unverändert.","保存データを読み込めませんでした。既存データは変更されていません。","저장된 데이터를 읽지 못했습니다. 기존 데이터는 변경되지 않았습니다.","无法读取已保存的数据，现有数据未更改。","تعذرت قراءة البيانات المحفوظة. لم يتم تغيير بياناتك الحالية."]
+    };
+    const categoryTranslationKeys = {Food:"categoryFood",Travel:"categoryTravel",Groceries:"categoryGroceries",Rent:"categoryRent",Shopping:"categoryShopping",Health:"categoryHealth",Entertainment:"categoryEntertainment"};
+    const paymentTranslationKeys = {Cash:"paymentCash",UPI:"paymentUpi",Card:"paymentCard",Bank:"paymentBank"};
+    Object.assign(translationRows,{
+      categoryFood:["Food","உணவு","भोजन","ఆహారం","ഭക്ഷണം","ಆಹಾರ","খাবার","अन्न","Comida","Alimentation","Essen","食費","식비","餐饮","طعام"],
+      categoryTravel:["Travel","பயணம்","यात्रा","ప్రయాణం","യാത്ര","ಪ್ರಯಾಣ","ভ্রমণ","प्रवास","Viajes","Voyages","Reisen","交通","교통","出行","السفر"],
+      categoryGroceries:["Groceries","மளிகைப் பொருட்கள்","किराना","కిరాణా","പലചരക്ക്","ದಿನಸಿ","মুদিখানা","किराणा","Supermercado","Courses","Lebensmittel","食料品","식료품","杂货","بقالة"],
+      categoryRent:["Rent","வாடகை","किराया","అద్దె","വാടക","ಬಾಡಿಗೆ","ভাড়া","भाडे","Alquiler","Loyer","Miete","家賃","월세","房租","إيجار"],
+      categoryShopping:["Shopping","ஷாப்பிங்","खरीदारी","షాపింగ్","ഷോപ്പിംഗ്","ಖರೀದಿ","কেনাকাটা","खरेदी","Compras","Achats","Einkäufe","買い物","쇼핑","购物","تسوق"],
+      categoryHealth:["Health","உடல்நலம்","स्वास्थ्य","ఆరోగ్యం","ആരോഗ്യം","ಆರೋಗ್ಯ","স্বাস্থ্য","आरोग्य","Salud","Santé","Gesundheit","健康","건강","医疗","الصحة"],
+      categoryEntertainment:["Entertainment","பொழுதுபோக்கு","मनोरंजन","వినోదం","വിനോദം","ಮನರಂಜನೆ","বিনোদন","मनोरंजन","Entretenimiento","Divertissement","Unterhaltung","娯楽","여가","娱乐","ترفيه"],
+      savingStatus:["Saving…","சேமிக்கிறது…","सहेजा जा रहा है…","సేవ్ అవుతోంది…","സംരക്ഷിക്കുന്നു…","ಉಳಿಸಲಾಗುತ್ತಿದೆ…","সংরক্ষণ হচ্ছে…","जतन करत आहे…","Guardando…","Enregistrement…","Wird gespeichert…","保存中…","저장 중…","正在保存…","جارٍ الحفظ…"],
+      savedStatus:["✓ Saved","✓ சேமிக்கப்பட்டது","✓ सहेजा गया","✓ సేవ్ అయింది","✓ സംരക്ഷിച്ചു","✓ ಉಳಿಸಲಾಗಿದೆ","✓ সংরক্ষিত","✓ जतन केले","✓ Guardado","✓ Enregistré","✓ Gespeichert","✓ 保存済み","✓ 저장됨","✓ 已保存","✓ تم الحفظ"],
+      partialSaveStatus:["Partial save","பகுதி சேமிப்பு","आंशिक रूप से सहेजा","పాక్షికంగా సేవ్ అయింది","ഭാഗികമായി സംരക്ഷിച്ചു","ಭಾಗಶಃ ಉಳಿಸಲಾಗಿದೆ","আংশিক সংরক্ষণ","अंशतः जतन","Guardado parcialmente","Enregistrement partiel","Teilweise gespeichert","一部のみ保存","일부 저장됨","部分保存","تم الحفظ جزئيًا"],
+      errorSaveStatus:["Not saved","சேமிக்கப்படவில்லை","सहेजा नहीं गया","సేవ్ కాలేదు","സംരക്ഷിച്ചില്ല","ಉಳಿಸಲಾಗಿಲ್ಲ","সংরক্ষণ হয়নি","जतन झाले नाही","No guardado","Non enregistré","Nicht gespeichert","未保存","저장되지 않음","未保存","لم يُحفظ"],
+      lastSaved:["Last saved: {time}","கடைசியாகச் சேமித்தது: {time}","आखिरी बार सहेजा: {time}","చివరిగా సేవ్ చేసింది: {time}","അവസാനം സംരക്ഷിച്ചത്: {time}","ಕೊನೆಯದಾಗಿ ಉಳಿಸಿದ್ದು: {time}","সর্বশেষ সংরক্ষণ: {time}","शेवटचे जतन: {time}","Último guardado: {time}","Dernière sauvegarde : {time}","Zuletzt gespeichert: {time}","最終保存: {time}","마지막 저장: {time}","上次保存：{time}","آخر حفظ: {time}"],
+      notSavedYet:["Not saved yet","இன்னும் சேமிக்கப்படவில்லை","अभी तक सहेजा नहीं गया","ఇంకా సేవ్ కాలేదు","ഇതുവരെ സംരക്ഷിച്ചിട്ടില്ല","ಇನ್ನೂ ಉಳಿಸಲಾಗಿಲ್ಲ","এখনও সংরক্ষিত হয়নি","अद्याप जतन केले नाही","Aún no guardado","Pas encore enregistré","Noch nicht gespeichert","未保存","아직 저장되지 않음","尚未保存","لم يُحفظ بعد"],
+      exportBackup:["↓ Export Backup","↓ காப்புப்பிரதியை ஏற்றுமதி செய்","↓ बैकअप निर्यात करें","↓ బ్యాకప్ ఎగుమతి చేయండి","↓ ബാക്കപ്പ് കയറ്റുമതി ചെയ്യുക","↓ ಬ್ಯಾಕಪ್ ರಫ್ತು ಮಾಡಿ","↓ ব্যাকআপ রপ্তানি করুন","↓ बॅकअप निर्यात करा","↓ Exportar copia","↓ Exporter la sauvegarde","↓ Backup exportieren","↓ バックアップを書き出す","↓ 백업 내보내기","↓ 导出备份","↓ تصدير نسخة احتياطية"],
+      importBackup:["↑ Import Backup","↑ காப்புப்பிரதியை இறக்குமதி செய்","↑ बैकअप आयात करें","↑ బ్యాకప్ దిగుమతి చేయండి","↑ ബാക്കപ്പ് ഇറക്കുമതി ചെയ്യുക","↑ ಬ್ಯಾಕಪ್ ಆಮದು ಮಾಡಿ","↑ ব্যাকআপ আমদানি করুন","↑ बॅकअप आयात करा","↑ Importar copia","↑ Importer la sauvegarde","↑ Backup importieren","↑ バックアップを読み込む","↑ 백업 가져오기","↑ 导入备份","↑ استيراد نسخة احتياطية"],
+      dataSaved:["Data Saved Successfully","தரவு வெற்றிகரமாகச் சேமிக்கப்பட்டது","डेटा सफलतापूर्वक सहेजा गया","డేటా విజయవంతంగా సేవ్ అయింది","ഡാറ്റ വിജയകരമായി സംരക്ഷിച്ചു","ಡೇಟಾ ಯಶಸ್ವಿಯಾಗಿ ಉಳಿಸಲಾಗಿದೆ","ডেটা সফলভাবে সংরক্ষিত হয়েছে","डेटा यशस्वीरीत्या जतन केले","Datos guardados correctamente","Données enregistrées avec succès","Daten erfolgreich gespeichert","データを保存しました","데이터가 저장되었습니다","数据已成功保存","تم حفظ البيانات بنجاح"],
+      partialSaveWarning:["Only one storage copy was saved. Keep this page open and export a backup.","ஒரு சேமிப்பிடத்தில் மட்டுமே சேமிக்கப்பட்டது. இந்தப் பக்கத்தைத் திறந்தே வைத்து காப்புப்பிரதியை ஏற்றுமதி செய்யவும்.","केवल एक संग्रहण में सहेजा गया। इस पेज को खुला रखें और बैकअप निर्यात करें।","ఒక నిల్వలో మాత్రమే సేవ్ అయింది. ఈ పేజీని తెరిచి ఉంచి బ్యాకప్ ఎగుమతి చేయండి.","ഒരു സംഭരണത്തിൽ മാത്രമാണ് സംരക്ഷിച്ചത്. ഈ പേജ് തുറന്നുവെച്ച് ബാക്കപ്പ് എടുക്കുക.","ಒಂದು ಸಂಗ್ರಹಣೆಯಲ್ಲಷ್ಟೇ ಉಳಿಸಲಾಗಿದೆ. ಈ ಪುಟವನ್ನು ತೆರೆದಿಟ್ಟು ಬ್ಯಾಕಪ್ ರಫ್ತು ಮಾಡಿ.","শুধু একটি স্টোরেজে সংরক্ষিত হয়েছে। এই পেজ খোলা রেখে ব্যাকআপ রপ্তানি করুন।","फक्त एका संचयनात जतन झाले. हे पृष्ठ उघडे ठेवा आणि बॅकअप निर्यात करा.","Guardado en un solo almacenamiento. Mantén esta página abierta y exporta una copia.","Enregistré dans un seul stockage. Gardez cette page ouverte et exportez une sauvegarde.","Nur an einem Speicherort gesichert. Seite geöffnet lassen und Backup exportieren.","1か所のみに保存されました。このページを開いたままバックアップを書き出してください。","한 저장소에만 저장되었습니다. 이 페이지를 열어 두고 백업을 내보내세요.","仅保存到一个存储位置。请保持页面打开并导出备份。","حُفظت نسخة واحدة فقط. أبقِ الصفحة مفتوحة وصدّر نسخة احتياطية."],
+      restoreConfirm:["Importing this backup replaces all current plans, expenses, income, and categories. Continue?","இந்தக் காப்புப்பிரதியை இறக்குமதி செய்தால் தற்போதைய திட்டங்கள், செலவுகள், வருமானம் மற்றும் வகைகள் மாற்றப்படும். தொடரவா?","इस बैकअप को आयात करने से मौजूदा योजनाएँ, खर्च, आय और श्रेणियाँ बदल जाएँगी। जारी रखें?","ఈ బ్యాకప్‌ను దిగుమతి చేస్తే ప్రస్తుత ప్రణాళికలు, ఖర్చులు, ఆదాయం, వర్గాలు భర్తీ అవుతాయి. కొనసాగించాలా?","ഈ ബാക്കപ്പ് ഇറക്കുമതി ചെയ്താൽ നിലവിലെ പദ്ധതികളും ചെലവുകളും വരുമാനവും വിഭാഗങ്ങളും മാറ്റിസ്ഥാപിക്കും. തുടരട്ടേ?","ಈ ಬ್ಯಾಕಪ್ ಆಮದು ಮಾಡಿದರೆ ಪ್ರಸ್ತುತ ಯೋಜನೆಗಳು, ವೆಚ್ಚಗಳು, ಆದಾಯ ಮತ್ತು ವರ್ಗಗಳು ಬದಲಾಯಿಸಲ್ಪಡುತ್ತವೆ. ಮುಂದುವರಿಸಬೇಕೇ?","এই ব্যাকআপ আমদানি করলে বর্তমান পরিকল্পনা, খরচ, আয় ও বিভাগ প্রতিস্থাপিত হবে। চালিয়ে যাবেন?","हा बॅकअप आयात केल्यास सध्याचे नियोजन, खर्च, उत्पन्न आणि श्रेणी बदलतील. पुढे जायचे?","Importar esta copia reemplazará los planes, gastos, ingresos y categorías actuales. ¿Continuar?","L’importation remplacera les projets, dépenses, revenus et catégories actuels. Continuer ?","Der Import ersetzt alle aktuellen Planungen, Ausgaben, Einnahmen und Kategorien. Fortfahren?","このバックアップを読み込むと、現在の予定、支出、収入、カテゴリが置き換わります。続行しますか？","이 백업을 가져오면 현재 계획, 지출, 수입 및 카테고리가 모두 대체됩니다. 계속할까요?","导入此备份将替换当前所有计划、支出、收入和类别。继续吗？","سيؤدي استيراد النسخة إلى استبدال الخطط والمصروفات والدخل والفئات الحالية. هل تريد المتابعة؟"],
+      invalidBackup:["This backup file is invalid or unsupported.","இந்தக் காப்புப்பிரதி கோப்பு தவறானது அல்லது ஆதரிக்கப்படவில்லை.","यह बैकअप फ़ाइल अमान्य या असमर्थित है।","ఈ బ్యాకప్ ఫైల్ చెల్లదు లేదా మద్దతు లేదు.","ഈ ബാക്കപ്പ് ഫയൽ അസാധുവാണ് അല്ലെങ്കിൽ പിന്തുണയ്ക്കുന്നില്ല.","ಈ ಬ್ಯಾಕಪ್ ಫೈಲ್ ಅಮಾನ್ಯವಾಗಿದೆ ಅಥವಾ ಬೆಂಬಲಿತವಲ್ಲ.","এই ব্যাকআপ ফাইলটি অবৈধ বা সমর্থিত নয়।","ही बॅकअप फाइल अवैध किंवा असमर्थित आहे.","El archivo de copia no es válido o no es compatible.","Fichier de sauvegarde invalide ou non pris en charge.","Diese Backup-Datei ist ungültig oder wird nicht unterstützt.","バックアップファイルが無効か、対応していません。","백업 파일이 올바르지 않거나 지원되지 않습니다.","备份文件无效或不受支持。","ملف النسخة الاحتياطية غير صالح أو غير مدعوم."],
+      backupRestored:["Backup restored successfully.","காப்புப்பிரதி வெற்றிகரமாக மீட்டமைக்கப்பட்டது.","बैकअप सफलतापूर्वक बहाल किया गया।","బ్యాకప్ విజయవంతంగా పునరుద్ధరించబడింది.","ബാക്കപ്പ് വിജയകരമായി പുനഃസ്ഥാപിച്ചു.","ಬ್ಯಾಕಪ್ ಯಶಸ್ವಿಯಾಗಿ ಮರುಸ್ಥಾಪಿಸಲಾಗಿದೆ.","ব্যাকআপ সফলভাবে পুনরুদ্ধার হয়েছে।","बॅकअप यशस्वीरीत्या पुनर्संचयित केले.","Copia restaurada correctamente.","Sauvegarde restaurée avec succès.","Backup erfolgreich wiederhergestellt.","バックアップを復元しました。","백업이 복원되었습니다.","备份已成功恢复。","تمت استعادة النسخة الاحتياطية بنجاح."],
+      backupExported:["Backup downloaded successfully.","காப்புப்பிரதி வெற்றிகரமாகப் பதிவிறக்கப்பட்டது.","बैकअप सफलतापूर्वक डाउनलोड किया गया।","బ్యాకప్ విజయవంతంగా డౌన్‌లోడ్ అయింది.","ബാക്കപ്പ് വിജയകരമായി ഡൗൺലോഡ് ചെയ്തു.","ಬ್ಯಾಕಪ್ ಯಶಸ್ವಿಯಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗಿದೆ.","ব্যাকআপ সফলভাবে ডাউনলোড হয়েছে।","बॅकअप यशस्वीरीत्या डाउनलोड केले.","Copia descargada correctamente.","Sauvegarde téléchargée avec succès.","Backup erfolgreich heruntergeladen.","バックアップをダウンロードしました。","백업을 다운로드했습니다.","备份已成功下载。","تم تنزيل النسخة الاحتياطية بنجاح."],
+      backupExportFailed:["Backup could not be downloaded.","காப்புப்பிரதியைப் பதிவிறக்க முடியவில்லை.","बैकअप डाउनलोड नहीं किया जा सका।","బ్యాకప్‌ను డౌన్‌లోడ్ చేయలేకపోయాం.","ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യാനായില്ല.","ಬ್ಯಾಕಪ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ.","ব্যাকআপ ডাউনলোড করা যায়নি।","बॅकअप डाउनलोड करता आला नाही.","No se pudo descargar la copia.","Impossible de télécharger la sauvegarde.","Backup konnte nicht heruntergeladen werden.","バックアップをダウンロードできませんでした。","백업을 다운로드하지 못했습니다.","无法下载备份。","تعذر تنزيل النسخة الاحتياطية."],
+      unsavedWarning:["Your latest changes are not fully saved. Leave this page anyway?","உங்கள் சமீபத்திய மாற்றங்கள் முழுமையாகச் சேமிக்கப்படவில்லை. இந்தப் பக்கத்தை விட்டு வெளியேறவா?","आपके नवीनतम बदलाव पूरी तरह सहेजे नहीं गए हैं। क्या आप पेज छोड़ना चाहते हैं?","మీ తాజా మార్పులు పూర్తిగా సేవ్ కాలేదు. ఈ పేజీని వదిలి వెళ్లాలా?","നിങ്ങളുടെ ഏറ്റവും പുതിയ മാറ്റങ്ങൾ പൂർണ്ണമായി സംരക്ഷിച്ചിട്ടില്ല. ഈ പേജ് വിടണോ?","ನಿಮ್ಮ ಇತ್ತೀಚಿನ ಬದಲಾವಣೆಗಳು ಸಂಪೂರ್ಣವಾಗಿ ಉಳಿಸಲಾಗಿಲ್ಲ. ಈ ಪುಟದಿಂದ ಹೊರಹೋಗಬೇಕೇ?","আপনার সাম্প্রতিক পরিবর্তনগুলি পুরোপুরি সংরক্ষিত হয়নি। পেজ ছেড়ে যাবেন?","तुमचे अलीकडील बदल पूर्णपणे जतन झालेले नाहीत. हे पृष्ठ सोडायचे?","Los últimos cambios no se han guardado por completo. ¿Salir de esta página?","Vos dernières modifications ne sont pas entièrement enregistrées. Quitter cette page ?","Die letzten Änderungen wurden nicht vollständig gespeichert. Seite verlassen?","最新の変更が完全に保存されていません。このページを離れますか？","최근 변경 사항이 완전히 저장되지 않았습니다. 페이지를 나갈까요?","最新更改尚未完全保存。仍要离开此页面吗？","لم تُحفظ تغييراتك الأخيرة بالكامل. هل تريد مغادرة الصفحة؟"]
+    });
+    const translations = Object.fromEntries(languageCodes.map((code,index)=>[
+      code,Object.fromEntries(Object.entries(translationRows).map(([key,values])=>[key,values[index]]))
+    ]));
+    function detectLanguage() {
+      try {
+        const saved=localStorage.getItem("ledgerly:language");
+        if(languageCodes.includes(saved))return saved;
+      } catch(error) {
+        console.warn("Language preference could not be read.",error);
+      }
+      for(const preferred of navigator.languages||[navigator.language||"en"]) {
+        const code=String(preferred).toLowerCase().split("-")[0];
+        if(languageCodes.includes(code))return code;
+      }
+      return "en";
+    }
+    let currentLanguage=detectLanguage();
+    const t=(key,values={})=>(translations[currentLanguage][key]||translations.en[key]||key).replace(/\{(\w+)\}/g,(match,name)=>values[name]??match);
+    const currentLocale=()=>localeInfo[currentLanguage].locale;
+    const currentCurrency=()=>localeInfo[currentLanguage].currency;
+    const currencySymbol=()=>new Intl.NumberFormat(currentLocale(),{style:"currency",currency:currentCurrency(),currencyDisplay:"narrowSymbol"}).formatToParts(0).find(part=>part.type==="currency")?.value||currentCurrency();
+    const amountLabel=key=>`${t(key).replace(/\s*\(₹\)/,"").trim()} (${currencySymbol()})`;
+    const categoryLabel=name=>categoryTranslationKeys[name]?t(categoryTranslationKeys[name]):name;
+    const paymentLabel=name=>paymentTranslationKeys[name]?t(paymentTranslationKeys[name]):name;
+    function setupLanguageSelector() {
+      const selector=$("languageSelector");
+      selector.innerHTML=languageCodes.map(code=>`<option value="${code}">${escapeHtml(languageNames[code])}</option>`).join("");
+      selector.value=currentLanguage;
+      selector.addEventListener("change",()=>{
+        currentLanguage=languageCodes.includes(selector.value)?selector.value:"en";
+        try{localStorage.setItem("ledgerly:language",currentLanguage);}catch(error){console.error("Could not save language preference.",error);showToast(t("languageSaveError"),true);}
+        applyLanguage();
+      });
+    }
+    function applyLanguage() {
+      const locale=currentLocale();
+      document.documentElement.lang=locale;
+      document.documentElement.dir=currentLanguage==="ar"?"rtl":"ltr";
+      document.title=t("pageTitle");
+      document.querySelectorAll("[data-i18n]").forEach(element=>{element.textContent=t(element.dataset.i18n);});
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(element=>{element.placeholder=t(element.dataset.i18nPlaceholder);});
+      document.querySelectorAll("[data-i18n-aria]").forEach(element=>{element.setAttribute("aria-label",t(element.dataset.i18nAria));});
+      document.querySelectorAll("[data-i18n-title]").forEach(element=>{element.title=t(element.dataset.i18nTitle);});
+      $("historyButton").textContent=activePage==="dashboard"?t("history"):t("dashboard");
+      renderSaveStatus();
+      $("greeting").textContent=t("greeting",{day:new Date().toLocaleDateString(locale,{weekday:"long"})});
+      $("todayLabel").textContent=new Date().toLocaleDateString(locale,{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+      render();
+    }
+    let state = { expenses: [], plannings: [], incomes: [], categories: [] };
+    let activeExpenseView = "daily";
+    let activePage = "dashboard";
+    let enteringRecordId = null;
+    let hasRenderedSummary = false;
+    const summaryAnimationFrames = new Map();
+    const storageKey = "ledgerly:records";
+    const databaseName = "ledgerly-local";
+    const databaseStore = "snapshots";
+    let indexedDbPromise = null;
+    let saveQueue = Promise.resolve();
+    let pendingSaves = 0;
+    let dataRevision = 0;
+    let fullySavedRevision = 0;
+    let hasUnsavedChanges = false;
+    let hasUnsubmittedChanges = false;
+    let lastSavedAt = 0;
+    let latestSaveStatus = "saved";
+    const builtInCategories = [
+      {name:"Food",color:"#f29a58",icon:"🍜"},{name:"Travel",color:"#5b9cdd",icon:"✈️"},
+      {name:"Groceries",color:"#57b88a",icon:"🛒"},{name:"Rent",color:"#9b81d8",icon:"🏠"},
+      {name:"Shopping",color:"#e879a7",icon:"🛍️"},{name:"Health",color:"#55b9bd",icon:"💊"},
+      {name:"Entertainment",color:"#e6b849",icon:"🎬"}
+    ];
+    const $ = id => document.getElementById(id);
+    const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+    const money = value => new Intl.NumberFormat(currentLocale(),{style:"currency",currency:currentCurrency(),maximumFractionDigits:0}).format(Number(value)||0);
+    const number = value => new Intl.NumberFormat(currentLocale()).format(Number(value)||0);
+    const localDate = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+    const dateNow = () => localDate(new Date());
+    const allCategories = () => [...builtInCategories,...state.categories.filter(x=>!x.deleted)];
+    const categoryInfo = name => allCategories().find(item=>item.name===name) || {name:name||"Other",color:"#8c91a3",icon:"◦"};
+    const visible = type => state[type].filter(record=>!record.deleted);
+    const dateOf = record => record.date || record.plannedDate || "";
+
+    function showToast(message, error=false) {
+      const el=document.createElement("div");el.className=`toast${error?" error":""}`;el.textContent=message;$("toastRoot").append(el);setTimeout(()=>el.remove(),3000);
+    }
+    function renderSaveStatus() {
+      const statusText={saving:"savingStatus",saved:"savedStatus",partial:"partialSaveStatus",error:"errorSaveStatus"};
+      $("saveStatus").dataset.state=saveState;
+      $("saveStatusText").textContent=t(statusText[saveState]);
+      $("lastSavedText").textContent=lastSavedAt?t("lastSaved",{time:new Date(lastSavedAt).toLocaleTimeString(currentLocale(),{hour:"numeric",minute:"2-digit"})}):t("notSavedYet");
+    }
+    let saveState = "saving";
+    function setSaveStatus(status) {
+      saveState=status;
+      renderSaveStatus();
+    }
+    function validStateData(value) {
+      if(!value||typeof value!=="object"||Array.isArray(value))return false;
+      if(!["expenses","plannings","incomes","categories"].every(key=>Array.isArray(value[key])))return false;
+      for(const key of ["expenses","plannings","incomes"]) {
+        if(!value[key].every(item=>item&&typeof item==="object"&&!Array.isArray(item)&&typeof item.id==="string"&&Number.isFinite(Number(item.amount))))return false;
+      }
+      return value.categories.every(item=>item&&typeof item==="object"&&!Array.isArray(item)&&typeof item.id==="string"&&typeof item.name==="string");
+    }
+    function decodeStoredData(value) {
+      const parsed=typeof value==="string"?JSON.parse(value):value;
+      if(parsed&&["ledgerly-storage","ledgerly-backup"].includes(parsed.format)&&parsed.version===1&&validStateData(parsed.data)) {
+        return {data:parsed.data,savedAt:Number(parsed.savedAt)||0,legacy:false};
+      }
+      if(validStateData(parsed))return {data:parsed,savedAt:0,legacy:true};
+      throw new Error(t("invalidBackup"));
+    }
+    function openIndexedDatabase() {
+      if(!("indexedDB" in window))return Promise.reject(new Error(t("storageError")));
+      if(!indexedDbPromise) {
+        indexedDbPromise=new Promise((resolve,reject)=>{
+          const request=indexedDB.open(databaseName,1);
+          request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains(databaseStore))request.result.createObjectStore(databaseStore);};
+          request.onsuccess=()=>{const database=request.result;database.onversionchange=()=>{database.close();indexedDbPromise=null;};resolve(database);};
+          request.onerror=()=>reject(request.error||new Error(t("storageError")));
+        }).catch(error=>{indexedDbPromise=null;throw error;});
+      }
+      return indexedDbPromise;
+    }
+    async function readIndexedSnapshot() {
+      const database=await openIndexedDatabase();
+      return new Promise((resolve,reject)=>{
+        let transaction;
+        try{transaction=database.transaction(databaseStore,"readonly");}catch(error){reject(error);return;}
+        const request=transaction.objectStore(databaseStore).get(storageKey);
+        request.onsuccess=()=>resolve(request.result??null);
+        request.onerror=()=>reject(request.error||transaction.error||new Error(t("storageError")));
+      });
+    }
+    async function writeIndexedSnapshot(serialized) {
+      const database=await openIndexedDatabase();
+      return new Promise((resolve,reject)=>{
+        let transaction;
+        try {
+          transaction=database.transaction(databaseStore,"readwrite");
+          transaction.objectStore(databaseStore).put(serialized,storageKey);
+        } catch(error){reject(error);return;}
+        transaction.oncomplete=()=>resolve();
+        transaction.onerror=()=>reject(transaction.error||new Error(t("storageError")));
+        transaction.onabort=()=>reject(transaction.error||new Error(t("storageError")));
+      });
+    }
+    async function persistSnapshot(announce=false) {
+      const revision=++dataRevision,savedAt=Math.max(Date.now(),lastSavedAt+1);
+      const snapshot={format:"ledgerly-storage",version:1,savedAt,data:JSON.parse(JSON.stringify(state))};
+      const serialized=JSON.stringify(snapshot);
+      pendingSaves++;hasUnsavedChanges=true;setSaveStatus("saving");
+      let localError=null;
+      try{localStorage.setItem(storageKey,serialized);}catch(error){localError=error;console.error("Could not save data to local storage.",error);}
+      const queued=saveQueue.catch(()=>{}).then(async()=>{
+        let indexedError=null;
+        try{await writeIndexedSnapshot(serialized);}catch(error){indexedError=error;console.error("Could not save data to IndexedDB.",error);}
+        const localSaved=!localError,indexedSaved=!indexedError;
+        if(!localSaved&&!indexedSaved)throw new Error(t("storageError"));
+        lastSavedAt=Math.max(lastSavedAt,savedAt);
+        if(localSaved&&indexedSaved) {
+          fullySavedRevision=Math.max(fullySavedRevision,revision);
+          hasUnsavedChanges=fullySavedRevision<dataRevision;
+        } else hasUnsavedChanges=true;
+        return {partial:!(localSaved&&indexedSaved)};
+      });
+      saveQueue=queued.catch(()=>{});
+      try {
+        const result=await queued;
+        latestSaveStatus=result.partial?"partial":hasUnsavedChanges?"saving":"saved";
+        if(announce)showToast(result.partial?t("partialSaveWarning"):t("dataSaved"),result.partial);
+        return result;
+      } catch(error) {
+        latestSaveStatus="error";
+        console.error("Both local data stores failed to save.",error);
+        throw error;
+      } finally {
+        pendingSaves--;
+        setSaveStatus(pendingSaves?"saving":hasUnsavedChanges?latestSaveStatus:"saved");
+      }
+    }
+    async function loadPersistedData() {
+      const [localResult,indexedResult]=await Promise.allSettled([
+        Promise.resolve().then(()=>localStorage.getItem(storageKey)),
+        readIndexedSnapshot()
+      ]);
+      const candidates=[];let readFailed=false;
+      for(const [source,result] of [["localStorage",localResult],["IndexedDB",indexedResult]]) {
+        if(result.status==="rejected"){console.error(`Could not read data from ${source}.`,result.reason);readFailed=true;continue;}
+        if(result.value===null||result.value===undefined)continue;
+        try{candidates.push({...decodeStoredData(result.value),source});}
+        catch(error){console.error(`Could not parse data from ${source}.`,error);readFailed=true;}
+      }
+      if(!candidates.length)return {found:false,failed:readFailed,needsSave:!readFailed};
+      candidates.sort((a,b)=>b.savedAt-a.savedAt);
+      const latest=candidates[0];
+      state=Object.fromEntries(["expenses","plannings","incomes","categories"].map(key=>[key,latest.data[key]]));
+      lastSavedAt=latest.savedAt;
+      hasUnsavedChanges=false;
+      fullySavedRevision=dataRevision;
+      const needsSave=readFailed||candidates.length<2||candidates.some(item=>item.legacy||item.savedAt!==latest.savedAt);
+      return {found:true,failed:false,needsSave};
+    }
+    async function initializeData() {
+      document.body.classList.add("storage-loading");
+      setSaveStatus("saving");
+      try {
+        const result=await loadPersistedData();
+        if(result.failed&&!result.found) {
+          setSaveStatus("error");
+          showToast(t("dataReadError"),true);
+        } else if(result.needsSave) {
+          try{const saved=await persistSnapshot();if(saved.partial)showToast(t("partialSaveWarning"),true);}
+          catch(error){showToast(error.message||t("storageError"),true);}
+        } else setSaveStatus("saved");
+      } catch(error) {
+        console.error("Could not initialize local data storage.",error);
+        setSaveStatus("error");
+        showToast(t("dataReadError"),true);
+      } finally {
+        applyLanguage();
+        document.body.classList.remove("storage-loading");
+      }
+    }
+    function backupDataFrom(value) {
+      let data=value;
+      if(value&&["ledgerly-backup","ledgerly-storage"].includes(value.format)&&value.version===1)data=value.data;
+      if(!validStateData(data))return null;
+      return Object.fromEntries(["expenses","plannings","incomes","categories"].map(key=>[key,data[key]]));
+    }
+    function exportBackup() {
+      try {
+        const backup={format:"ledgerly-backup",version:1,exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(state))};
+        const url=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:"application/json"}));
+        const link=document.createElement("a");link.href=url;link.download=`ledgerly-backup-${dateNow()}.json`;document.body.append(link);link.click();link.remove();
+        window.setTimeout(()=>URL.revokeObjectURL(url),1000);
+        showToast(t("backupExported"));
+      } catch(error) {
+        console.error("Could not export a data backup.",error);
+        showToast(t("backupExportFailed"),true);
+      }
+    }
+    async function importBackup(file) {
+      let parsed;
+      try{parsed=JSON.parse(await file.text());}catch(error){console.error("Could not parse the selected backup.",error);showToast(t("invalidBackup"),true);return;}
+      const imported=backupDataFrom(parsed);
+      if(!imported){showToast(t("invalidBackup"),true);return;}
+      if(!confirm(t("restoreConfirm")))return;
+      const previous=state;state=imported;
+      try {
+        const result=await persistSnapshot();
+        render();
+        showToast(result.partial?t("partialSaveWarning"):t("backupRestored"),result.partial);
+      } catch(error) {
+        state=previous;render();showToast(error.message||t("storageError"),true);
+      }
+    }
+    async function persistRecord(type,record) {
+      const list=state[type],index=list.findIndex(item=>item.id===record.id),previous=index<0?null:list[index];
+      if(index<0)list.push(record);else list[index]=record;
+      try{await persistSnapshot(true);}catch(error){if(index<0)list.pop();else list[index]=previous;throw error;}
+      if(index<0&&(type==="expenses"||type==="plannings"))enteringRecordId=record.id;
+      render();
+      if(enteringRecordId){window.setTimeout(()=>document.querySelectorAll(".list-enter").forEach(element=>element.classList.remove("list-enter")),500);enteringRecordId=null;}
+    }
+    async function removeRecord(type,id,trigger) {
+      const card=trigger.closest(".planning-card,.expense-row,.history-card");
+      if(card?.classList.contains("is-removing"))return;
+      if(card&&!prefersReducedMotion()){card.classList.add("is-removing");await new Promise(resolve=>window.setTimeout(resolve,220));}
+      const list=state[type],index=list.findIndex(item=>item.id===id);if(index<0)return;
+      const [removed]=list.splice(index,1);
+      try{await persistSnapshot(true);}catch(error){list.splice(index,0,removed);render();showToast(error.message,true);return;}
+      render();
+    }
+    function newId(){return crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`;}
+    function fmtDate(date) {
+      if(!date)return t("noDate");
+      const parsed=new Date(`${date}T00:00:00`);
+      return Number.isNaN(parsed.getTime())?date:parsed.toLocaleDateString(currentLocale(),{day:"numeric",month:"short",year:"numeric"});
+    }
+    function fmtTime(time,date=dateNow()) {
+      if(!time)return "";
+      const parsed=new Date(`${date}T${time}`);
+      return Number.isNaN(parsed.getTime())?time:parsed.toLocaleTimeString(currentLocale(),{hour:"numeric",minute:"2-digit"});
+    }
+    function fmtMonth(month) {
+      if(!month)return "";
+      const parsed=new Date(`${month}-01T00:00:00`);
+      return Number.isNaN(parsed.getTime())?month:parsed.toLocaleDateString(currentLocale(),{month:"long",year:"numeric"});
+    }
+    function getYearChoices() {
+      const years=new Set([String(new Date().getFullYear())]);
+      [...visible("expenses"),...visible("plannings"),...visible("incomes")].forEach(record=>{const y=dateOf(record).slice(0,4);if(y)years.add(y);});
+      return [...years].sort((a,b)=>b-a);
+    }
+    function setSelectOptions(select,items,firstLabel) {
+      const old=select.value;select.innerHTML=`<option value="">${firstLabel}</option>`+items.map(item=>`<option value="${escapeHtml(item.value)}">${escapeHtml(item.label)}</option>`).join("");
+      if(items.some(item=>String(item.value)===old))select.value=old;
+    }
+    function animateContent(element,update) {
+      if(prefersReducedMotion()){update();return;}
+      element.classList.remove("view-switching");void element.offsetWidth;update();element.classList.add("view-switching");
+      window.setTimeout(()=>element.classList.remove("view-switching"),280);
+    }
+    function animateMoneyCount(element,value) {
+      if(prefersReducedMotion()){element.textContent=money(value);return;}
+      cancelAnimationFrame(summaryAnimationFrames.get(element.id));
+      const start=performance.now(),duration=720;
+      const frame=now=>{
+        const progress=Math.min((now-start)/duration,1),eased=1-Math.pow(1-progress,3);
+        element.textContent=money(value*eased);
+        if(progress<1)summaryAnimationFrames.set(element.id,requestAnimationFrame(frame));
+        else{summaryAnimationFrames.delete(element.id);element.textContent=money(value);}
+      };
+      summaryAnimationFrames.set(element.id,requestAnimationFrame(frame));
+    }
+    function updateFilters() {
+      const cats=allCategories().map(item=>({value:item.name,label:`${item.icon} ${categoryLabel(item.name)}`}));setSelectOptions($("planCategoryFilter"),cats,t("allCategories"));setSelectOptions($("expenseCategoryFilter"),cats,t("allCategories"));
+      const months=Array.from({length:12},(_,i)=>({value:String(i+1).padStart(2,"0"),label:new Date(2000,i,1).toLocaleString(currentLocale(),{month:"long"})}));
+      setSelectOptions($("planMonthFilter"),months,t("allMonths"));
+      const years=getYearChoices().map(year=>({value:year,label:new Intl.NumberFormat(currentLocale(),{useGrouping:false}).format(Number(year))}));setSelectOptions($("planYearFilter"),years,t("allYears"));setSelectOptions($("historyYear"),years,t("allYears"));
+      setSelectOptions($("historyType"),[["","everything"],["planning","plannings"],["expense","expenses"],["income","income"]].map(([value,key])=>({value,label:t(key)})),t("everything"));
+    }
+    function renderPlans() {
+      const month=$("planMonthFilter").value,year=$("planYearFilter").value,category=$("planCategoryFilter").value;
+      const records=visible("plannings").filter(item=>(!month||item.plannedDate?.slice(5,7)===month)&&(!year||item.plannedDate?.slice(0,4)===year)&&(!category||item.category===category)).sort((a,b)=>(a.plannedDate||"").localeCompare(b.plannedDate||""));
+      $("planTotal").textContent=money(records.reduce((sum,item)=>sum+Number(item.amount||0),0));
+      $("planningList").innerHTML=records.length?records.map(item=>{const cat=categoryInfo(item.category),entering=item.id===enteringRecordId?" list-enter":"";return `<article class="planning-card${entering}" style="--cat-color:${escapeHtml(cat.color)}"><div class="item-top"><span class="category-icon">${escapeHtml(cat.icon)}</span><div class="item-main"><div class="item-title">${escapeHtml(item.title)}</div><div class="item-sub">${escapeHtml(categoryLabel(item.category))} · ${escapeHtml(fmtDate(item.plannedDate))}</div></div><div class="item-amount">${money(item.amount)}</div><div class="item-actions"><button data-edit="plannings" data-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(t("editPlan"))}">✎</button><button data-delete="plannings" data-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(t("delete"))}">×</button></div></div>${item.note?`<p class="item-note">${escapeHtml(item.note)}</p>`:""}</article>`}).join(""):`<div class="empty-state"><span>🗒️</span>${escapeHtml(t("emptyPlans"))}</div>`;
+    }
+    function matchingExpenses() {
+      let records=visible("expenses").slice().sort((a,b)=>`${b.date||""}T${b.time||""}`.localeCompare(`${a.date||""}T${a.time||""}`));
+      const selectedDate=$("expenseDateFilter").value,category=$("expenseCategoryFilter").value,query=$("expenseSearch").value.trim().toLowerCase();
+      if(category)records=records.filter(item=>item.category===category);
+      if(query)records=records.filter(item=>`${item.title} ${item.category} ${item.note||""} ${item.paymentMethod||""}`.toLowerCase().includes(query));
+      if(selectedDate) {
+        if(activeExpenseView==="daily")records=records.filter(item=>item.date===selectedDate);
+        if(activeExpenseView==="weekly") {
+          const chosen=new Date(`${selectedDate}T00:00:00`),start=new Date(chosen);start.setDate(chosen.getDate()-((chosen.getDay()+6)%7));
+          const end=new Date(start);end.setDate(start.getDate()+7);
+          records=records.filter(item=>{const date=new Date(`${item.date}T00:00:00`);return date>=start&&date<end;});
+        }
+        if(activeExpenseView==="monthly")records=records.filter(item=>item.date?.slice(0,7)===selectedDate.slice(0,7));
+        if(activeExpenseView==="yearly")records=records.filter(item=>item.date?.slice(0,4)===selectedDate.slice(0,4));
+      } else if(activeExpenseView==="daily")records=records.filter(item=>item.date===dateNow());
+      else if(activeExpenseView==="weekly") {
+        const chosen=new Date(`${dateNow()}T00:00:00`),start=new Date(chosen);start.setDate(chosen.getDate()-((chosen.getDay()+6)%7));
+        const end=new Date(start);end.setDate(start.getDate()+7);
+        records=records.filter(item=>{const date=new Date(`${item.date}T00:00:00`);return date>=start&&date<end;});
+      }
+      else if(activeExpenseView==="monthly")records=records.filter(item=>item.date?.slice(0,7)===dateNow().slice(0,7));
+      else records=records.filter(item=>item.date?.slice(0,4)===dateNow().slice(0,4));
+      return records;
+    }
+    function renderExpenses() {
+      const records=matchingExpenses().slice(0,8);
+      $("expenseList").innerHTML=records.length?records.map(item=>{const cat=categoryInfo(item.category),entering=item.id===enteringRecordId?" list-enter":"";return `<div class="expense-row${entering}" data-detail="${escapeHtml(item.id)}"><span class="category-icon" style="--cat-color:${escapeHtml(cat.color)}">${escapeHtml(cat.icon)}</span><div class="item-main"><div class="item-title">${escapeHtml(item.title)}</div><div class="item-sub">${escapeHtml(categoryLabel(item.category))} · ${escapeHtml(fmtDate(item.date))}${item.time?` · ${escapeHtml(fmtTime(item.time,item.date))}`:""}</div></div><div class="expense-amount">−${money(item.amount)}<small>${escapeHtml(paymentLabel(item.paymentMethod)||"")}</small></div><div class="item-actions"><button data-edit="expenses" data-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(t("editExpense"))}">✎</button><button data-delete="expenses" data-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(t("delete"))}">×</button></div></div>`}).join(""):`<div class="empty-state"><span>✨</span>${escapeHtml(t("emptyExpenses"))}</div>`;
+    }
+    function renderComparison() {
+      const planned=new Map(),actual=new Map();
+      visible("plannings").forEach(item=>planned.set(item.category,(planned.get(item.category)||0)+Number(item.amount||0)));
+      visible("expenses").forEach(item=>actual.set(item.category,(actual.get(item.category)||0)+Number(item.amount||0)));
+      const names=[...new Set([...planned.keys(),...actual.keys()])];
+      $("comparisonList").innerHTML=names.length?names.map(name=>{const p=planned.get(name)||0,a=actual.get(name)||0,pct=p?Math.min(a/p*100,100):100,cat=categoryInfo(name);return `<div class="comparison-row"><div class="compare-name">${escapeHtml(cat.icon)} ${escapeHtml(categoryLabel(name))}</div><div class="progress"><span class="${a>p?"over":""}" data-progress="${pct}"></span></div><div class="compare-number"><strong>${money(a)}</strong>${p?`${escapeHtml(t("of"))} ${money(p)}`:escapeHtml(t("notPlanned"))}</div></div>`}).join(""):`<div class="empty-state">${escapeHtml(t("addPlansComparison"))}</div>`;
+      requestAnimationFrame(()=>$("comparisonList").querySelectorAll(".progress span").forEach(bar=>{bar.style.width=`${bar.dataset.progress}%`;}));
+      const over=names.map(name=>({name,p:planned.get(name)||0,a:actual.get(name)||0})).filter(row=>row.p&&row.a>row.p);
+      $("comparisonSummary").textContent=over.length?over.map(row=>t("overBudget",{planned:money(row.p),category:categoryLabel(row.name),actual:money(row.a),over:money(row.a-row.p)})).join(" "):t("withinPlan");
+    }
+    function renderIncome() {
+      const incomes=visible("incomes"),salary=incomes.filter(item=>item.kind==="salary").reduce((sum,item)=>sum+Number(item.amount||0),0),other=incomes.filter(item=>item.kind==="other").reduce((sum,item)=>sum+Number(item.amount||0),0);
+      $("incomeBreakdown").innerHTML=`<div class="comparison-row"><span class="compare-name">💼 ${escapeHtml(t("salary"))}</span><div class="subtle">${escapeHtml(t("salaryRecorded"))}</div><div class="compare-number"><strong>${money(salary)}</strong>${escapeHtml(t("total"))}</div></div><div class="comparison-row"><span class="compare-name">🎁 ${escapeHtml(t("otherIncome"))}</span><div class="subtle">${escapeHtml(t("otherRecorded"))}</div><div class="compare-number"><strong>${money(other)}</strong>${escapeHtml(t("total"))}</div></div>`+incomes.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).slice(0,3).map(item=>`<div class="expense-row"><span class="category-icon">${item.kind==="salary"?"💼":"💸"}</span><div class="item-main"><div class="item-title">${escapeHtml(item.kind==="salary"?t("salary"):item.source||t("otherIncome"))}</div><div class="item-sub">${escapeHtml(item.reason||fmtMonth(item.month)||fmtDate(item.date))} · ${escapeHtml(fmtDate(item.date))}</div></div><div class="expense-amount" style="color:var(--green)">+${money(item.amount)}</div><div class="item-actions"><button data-edit="incomes" data-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(t("editIncome"))}">✎</button><button data-delete="incomes" data-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(t("delete"))}">×</button></div></div>`).join("");
+    }
+    function renderSummary() {
+      const expenses=visible("expenses"),incomes=visible("incomes"),plans=visible("plannings");
+      const expenseTotal=expenses.reduce((sum,item)=>sum+Number(item.amount||0),0),incomeTotal=incomes.reduce((sum,item)=>sum+Number(item.amount||0),0),planned=plans.reduce((sum,item)=>sum+Number(item.amount||0),0);
+      const firstRender=!hasRenderedSummary;
+      for(const [id,value] of [["balanceValue",incomeTotal-expenseTotal],["incomeValue",incomeTotal],["expenseValue",expenseTotal]]){const element=$(id);if(firstRender)animateMoneyCount(element,value);else{cancelAnimationFrame(summaryAnimationFrames.get(id));summaryAnimationFrames.delete(id);element.textContent=money(value);}}
+      hasRenderedSummary=true;
+      $("plannedActualValue").textContent=money(planned-expenseTotal);$("plannedActualMeta").textContent=t("plannedActualMeta",{planned:money(planned),actual:money(expenseTotal)});
+      $("incomeMeta").textContent=t("salaryOther",{salary:money(incomes.filter(x=>x.kind==="salary").reduce((s,x)=>s+Number(x.amount||0),0)),other:money(incomes.filter(x=>x.kind==="other").reduce((s,x)=>s+Number(x.amount||0),0))});
+      const count=number(expenses.length);$("expenseMeta").textContent=t(expenses.length===1?"transactionOne":"transactionMany",{count});
+    }
+    const svgText=(text,x,y,anchor="middle")=>`<text class="chart-label" x="${x}" y="${y}" text-anchor="${anchor}">${escapeHtml(text)}</text>`;
+    const compactMoney=value=>Math.abs(Number(value)||0)<1000?money(value):new Intl.NumberFormat(currentLocale(),{style:"currency",currency:currentCurrency(),notation:"compact",maximumFractionDigits:1}).format(Number(value)||0);
+    const chartEmpty=message=>`<div class="empty-state" style="margin-top:20px">${escapeHtml(message)}</div>`;
+    function renderCategoryChart(records) {
+      const totals=new Map();
+      records.forEach(item=>totals.set(item.category,(totals.get(item.category)||0)+Number(item.amount||0)));
+      const entries=[...totals.entries()].filter(([,amount])=>amount>0).sort((a,b)=>b[1]-a[1]);
+      const total=entries.reduce((sum,[,amount])=>sum+amount,0);
+      if(!total)return chartEmpty(t("emptyCategoryChart"));
+      const circumference=2*Math.PI*62;
+      let offset=0;
+      const arcs=entries.map(([name,amount])=>{
+        const segment=amount/total*circumference,info=categoryInfo(name),currentOffset=offset;offset+=segment;
+        return `<circle class="chart-segment" cx="110" cy="94" r="62" fill="none" stroke="${escapeHtml(info.color)}" stroke-width="23" stroke-dasharray="${segment} ${circumference-segment}" style="--target-offset:${-currentOffset}" transform="rotate(-90 110 94)"><title>${escapeHtml(categoryLabel(name))}: ${money(amount)}</title></circle>`;
+      }).join("");
+      const legend=entries.map(([name,amount])=>`<span class="chart-legend-item"><i style="background:${escapeHtml(categoryInfo(name).color)}"></i>${escapeHtml(categoryLabel(name))} ${compactMoney(amount)}</span>`).join("");
+      $("categoryChart").innerHTML=`<svg viewBox="0 0 220 188" aria-hidden="true"><circle cx="110" cy="94" r="62" fill="none" stroke="var(--line)" stroke-width="23"/>${arcs}${svgText(compactMoney(total),110,91)}${svgText(t("totalSpent"),110,108)}</svg><div class="chart-legend">${legend}</div>`;
+    }
+    function renderMonthlyChart(expenses,incomes) {
+      const months=Array.from({length:6},(_,index)=>{const date=new Date();date.setDate(1);date.setMonth(date.getMonth()-5+index);return date;});
+      const key=date=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`;
+      const amountFor=(records,date)=>records.filter(item=>(item.date||"").slice(0,7)===key(date)).reduce((sum,item)=>sum+Number(item.amount||0),0);
+      const expenseData=months.map(date=>amountFor(expenses,date)),incomeData=months.map(date=>amountFor(incomes,date));
+      const max=Math.max(1,...expenseData,...incomeData),base=177,top=18,plotHeight=base-top,groupWidth=82,startX=62;
+      const grid=[0,1,2,3].map(step=>{const y=base-plotHeight*step/3;return `<line class="chart-grid" x1="52" x2="590" y1="${y}" y2="${y}"/>${svgText(compactMoney(max*step/3),46,y+3,"end")}`;}).join("");
+      const bars=months.map((date,index)=>{
+        const center=startX+index*groupWidth+groupWidth/2,expenseHeight=expenseData[index]/max*plotHeight,incomeHeight=incomeData[index]/max*plotHeight;
+        return `<rect class="chart-bar-vertical" style="--bar-delay:${index*.05}s" x="${center-16}" y="${base-incomeHeight}" width="13" height="${incomeHeight}" rx="3" fill="#59ba91"><title>${escapeHtml(t("income"))}: ${money(incomeData[index])}</title></rect><rect class="chart-bar-vertical" style="--bar-delay:${index*.05+.025}s" x="${center+2}" y="${base-expenseHeight}" width="13" height="${expenseHeight}" rx="3" fill="#8d7fea"><title>${escapeHtml(t("expenses"))}: ${money(expenseData[index])}</title></rect>${svgText(date.toLocaleString(currentLocale(),{month:"short"}),center,198)}`;
+      }).join("");
+      $("monthlyChart").innerHTML=`<svg viewBox="0 0 600 220" aria-hidden="true">${grid}${bars}</svg><div class="chart-legend"><span class="chart-legend-item"><i style="background:#59ba91"></i>${escapeHtml(t("income"))}</span><span class="chart-legend-item"><i style="background:#8d7fea"></i>${escapeHtml(t("expenses"))}</span></div>`;
+    }
+    function renderTrendChart(expenses) {
+      const days=Array.from({length:14},(_,index)=>{const date=new Date();date.setDate(date.getDate()-13+index);return date;});
+      const values=days.map(date=>expenses.filter(item=>item.date===localDate(date)).reduce((sum,item)=>sum+Number(item.amount||0),0));
+      const max=Math.max(1,...values),left=48,right=588,top=20,bottom=178,width=right-left,height=bottom-top;
+      const points=values.map((value,index)=>`${left+width*index/(values.length-1)},${bottom-value/max*height}`).join(" ");
+      const guides=[0,1,2,3].map(step=>{const y=bottom-height*step/3;return `<line class="chart-grid" x1="${left}" x2="${right}" y1="${y}" y2="${y}"/>${svgText(compactMoney(max*step/3),left-7,y+3,"end")}`;}).join("");
+      const dots=values.map((value,index)=>`<circle cx="${left+width*index/(values.length-1)}" cy="${bottom-value/max*height}" r="3" fill="#7668df"><title>${escapeHtml(days[index].toLocaleDateString(currentLocale(),{day:"numeric",month:"short"}))}: ${money(value)}</title></circle>`).join("");
+      const labels=days.map((date,index)=>index%2===0?svgText(date.toLocaleDateString(currentLocale(),{day:"numeric",month:"short"}),left+width*index/(days.length-1),199):"").join("");
+      $("trendChart").innerHTML=`<svg viewBox="0 0 600 220" aria-hidden="true">${guides}<polygon class="chart-area" points="${left},${bottom} ${points} ${right},${bottom}" fill="#7668df"/><polyline class="chart-line" pathLength="1000" points="${points}" fill="none" stroke="#7668df" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${dots}${labels}</svg>`;
+    }
+    function renderPlanChart(plans,expenses) {
+      const names=[...new Set([...plans.map(item=>item.category),...expenses.map(item=>item.category)])];
+      if(!names.length)return chartEmpty(t("emptyPlanChart"));
+      const rows=names.map(name=>({name,planned:plans.filter(item=>item.category===name).reduce((sum,item)=>sum+Number(item.amount||0),0),actual:expenses.filter(item=>item.category===name).reduce((sum,item)=>sum+Number(item.amount||0),0)}));
+      const max=Math.max(1,...rows.flatMap(row=>[row.planned,row.actual])),height=Math.max(220,rows.length*42+12);
+      const content=rows.map((row,index)=>{
+        const y=index*42+7,label=categoryInfo(row.name).icon+" "+categoryLabel(row.name),width=380;
+        return `${svgText(label,8,y+12,"start")}<rect class="chart-bar-horizontal" style="--bar-delay:${index*.06}s" x="150" y="${y}" width="${row.planned/max*width}" height="12" rx="4" fill="#b8b2f3"><title>${escapeHtml(t("planned"))}: ${money(row.planned)}</title></rect><rect class="chart-bar-horizontal" style="--bar-delay:${index*.06+.03}s" x="150" y="${y+16}" width="${row.actual/max*width}" height="12" rx="4" fill="${row.actual>row.planned?"#df626b":"#7668df"}"><title>${escapeHtml(t("actual"))}: ${money(row.actual)}</title></rect>`;
+      }).join("");
+      $("planChart").innerHTML=`<svg viewBox="0 0 600 ${height}" style="height:${height}px" aria-hidden="true">${content}</svg><div class="chart-legend"><span class="chart-legend-item"><i style="background:#b8b2f3"></i>${escapeHtml(t("planned"))}</span><span class="chart-legend-item"><i style="background:#7668df"></i>${escapeHtml(t("actual"))}</span></div>`;
+    }
+    function drawCharts() {
+      const expenses=visible("expenses"),plans=visible("plannings"),incomes=visible("incomes");
+      renderCategoryChart(expenses);renderMonthlyChart(expenses,incomes);renderTrendChart(expenses);renderPlanChart(plans,expenses);
+    }
+    function renderHistory() {
+      const type=$("historyType").value,year=$("historyYear").value,query=$("historySearch").value.toLowerCase().trim();
+      let records=[...visible("plannings").map(item=>({...item,_type:"planning"})),...visible("expenses").map(item=>({...item,_type:"expense"})),...visible("incomes").map(item=>({...item,_type:"income"}))];
+      if(type)records=records.filter(item=>item._type===type);if(year)records=records.filter(item=>dateOf(item).startsWith(year));if(query)records=records.filter(item=>`${item.title||""} ${item.category||""} ${item.source||""} ${item.reason||""} ${item.note||""}`.toLowerCase().includes(query));
+      records.sort((a,b)=>dateOf(b).localeCompare(dateOf(a)));
+      $("historyList").innerHTML=records.length?records.map(item=>{let label=item._type==="planning"?t("plannings"):item._type==="expense"?t("expenses"):item.kind==="salary"?t("salary"):t("otherIncome");let icon=item._type==="expense"?categoryInfo(item.category).icon:item._type==="planning"?"🗒️":"💰";const recordType=item._type==="planning"?"plannings":item._type==="expense"?"expenses":"incomes";return `<article class="history-card"><h3>${escapeHtml(icon)} ${escapeHtml(item.title||item.source||label)} <span class="muted">· ${escapeHtml(label)}</span></h3><div class="history-count">${escapeHtml(fmtDate(dateOf(item)))} · ${money(item.amount)}${item.category?` · ${escapeHtml(categoryLabel(item.category))}`:""}</div><div class="item-actions" style="margin-top:8px"><button data-edit="${recordType}" data-id="${escapeHtml(item.id)}">${escapeHtml(t("edit"))}</button><button data-delete="${recordType}" data-id="${escapeHtml(item.id)}">${escapeHtml(t("delete"))}</button></div></article>`}).join(""):`<div class="empty-state" style="grid-column:1/-1">${escapeHtml(t("noHistory"))}</div>`;
+    }
+    function render() {
+      updateFilters();renderSummary();renderPlans();renderExpenses();renderComparison();renderIncome();renderHistory();drawCharts();
+    }
+    function categoryOptions(selected="") {
+      return allCategories().map(item=>`<option value="${escapeHtml(item.name)}" ${item.name===selected?"selected":""}>${escapeHtml(item.icon)} ${escapeHtml(categoryLabel(item.name))}</option>`).join("")+`<option value="__custom__">${escapeHtml(t("createCategory"))}</option>`;
+    }
+    function openModal(title,content,onSubmit) {
+      $("modalRoot").innerHTML=`<div class="modal-backdrop"><section class="modal" role="dialog" aria-modal="true"><div class="modal-head"><h2>${escapeHtml(title)}</h2><button class="close-btn" type="button" aria-label="${escapeHtml(t("close"))}" title="${escapeHtml(t("close"))}">×</button></div><form><div class="form-grid">${content}</div><div class="modal-footer"><button type="button" class="cancel-btn">${escapeHtml(t("cancel"))}</button><button type="submit" class="primary-btn">${escapeHtml(t("save"))}</button></div></form></section></div>`;
+      const root=$("modalRoot"),backdrop=root.querySelector(".modal-backdrop");let closing=false;
+      const close=()=>{if(closing)return;closing=true;hasUnsubmittedChanges=false;if(prefersReducedMotion()){root.replaceChildren();return;}backdrop.classList.add("is-closing");window.setTimeout(()=>root.replaceChildren(),190);};
+      root.closeModal=close;root.querySelector(".close-btn").onclick=close;root.querySelector(".cancel-btn").onclick=close;backdrop.addEventListener("click",event=>{if(event.target===event.currentTarget)close();});
+      const form=root.querySelector("form");
+      form.addEventListener("input",()=>{hasUnsubmittedChanges=true;});
+      form.addEventListener("change",()=>{hasUnsubmittedChanges=true;});
+      form.addEventListener("submit",async event=>{event.preventDefault();if(!form.reportValidity())return;const draftWasDirty=hasUnsubmittedChanges;hasUnsubmittedChanges=false;try{await onSubmit(new FormData(form));close();}catch(error){hasUnsubmittedChanges=draftWasDirty;console.error("Could not save form.",error);showToast(error.message||t("storageError"),true);}});
+      return root;
+    }
+    const field=(label,name,value="",type="text",extra="")=>`<div class="field"><label for="field-${name}">${escapeHtml(label)}</label><input id="field-${name}" name="${name}" type="${type}" value="${escapeHtml(value)}" ${extra} required></div>`;
+    const noteField=value=>`<div class="field full"><label for="field-note">${escapeHtml(t("noteField"))}</label><textarea id="field-note" name="note">${escapeHtml(value||"")}</textarea></div>`;
+    function selectField(label,name,options,selected="") {
+      const selectedOptions=selected?options.replace(`value="${escapeHtml(selected)}"`,`value="${escapeHtml(selected)}" selected`):options;
+      return `<div class="field"><label for="field-${name}">${escapeHtml(label)}</label><select id="field-${name}" name="${name}" required>${selectedOptions}</select></div>`;
+    }
+    function openPlanForm(existing) {
+      const item=existing||{};const root=openModal(existing?t("editPlan"):t("addPlanTitle"),field(t("titleField"),"title",item.title||"","text",'maxlength="80"')+field(amountLabel("plannedAmountField"),"amount",item.amount||"","number",'min="0.01" step="0.01"')+selectField(t("categoryField"),"category",categoryOptions(item.category),item.category)+field(t("plannedDateField"),"plannedDate",item.plannedDate||dateNow(),"date")+noteField(item.note),async data=>{
+        let category=data.get("category");if(category==="__custom__")category=await createCategoryPrompt();
+        if(!category)throw new Error(t("chooseCategory"));
+        await persistRecord("plannings",{...item,id:item.id||newId(),title:data.get("title").trim(),amount:Number(data.get("amount")),category,plannedDate:data.get("plannedDate"),note:data.get("note").trim()});
+      });
+      root.querySelector('[name="category"]').addEventListener("change",async event=>{if(event.target.value==="__custom__"){const name=await createCategoryPrompt();if(name){event.target.innerHTML=categoryOptions(name);event.target.value=name}else event.target.value="";}});
+    }
+    function openExpenseForm(existing) {
+      const item=existing||{};const root=openModal(existing?t("editExpense"):t("addExpenseTitle"),field(t("titleField"),"title",item.title||"","text",'maxlength="80"')+field(amountLabel("amountField"),"amount",item.amount||"","number",'min="0.01" step="0.01"')+selectField(t("categoryField"),"category",categoryOptions(item.category),item.category)+field(t("dateField"),"date",item.date||dateNow(),"date")+field(t("timeField"),"time",item.time||new Date().toTimeString().slice(0,5),"time")+selectField(t("paymentMethodField"),"paymentMethod",["Cash","UPI","Card","Bank"].map(x=>`<option value="${x}">${escapeHtml(paymentLabel(x))}</option>`).join(""),item.paymentMethod)+noteField(item.note),async data=>{
+        let category=data.get("category");if(category==="__custom__")category=await createCategoryPrompt();
+        if(!category)throw new Error(t("chooseCategory"));
+        await persistRecord("expenses",{...item,id:item.id||newId(),title:data.get("title").trim(),amount:Number(data.get("amount")),category,date:data.get("date"),time:data.get("time"),paymentMethod:data.get("paymentMethod"),note:data.get("note").trim()});
+      });
+      root.querySelector('[name="category"]').addEventListener("change",async event=>{if(event.target.value==="__custom__"){const name=await createCategoryPrompt();if(name){event.target.innerHTML=categoryOptions(name);event.target.value=name}else event.target.value="";}});
+    }
+    function openIncomeForm(existing) {
+      const item=existing||{};const kind=item.kind||"salary";
+      const root=openModal(existing?t("editIncome"):t("addIncomeTitle"),selectField(t("incomeType"),"kind",`<option value="salary">${escapeHtml(t("salary"))}</option><option value="other">${escapeHtml(t("otherIncome"))}</option>`,kind)+field(amountLabel("amountField"),"amount",item.amount||"","number",'min="0.01" step="0.01"')+field(t("dateField"),"date",item.date||dateNow(),"date")+field(t("salaryMonth"),"month",item.month||dateNow().slice(0,7),"month")+field(t("sourcePerson"),"source",item.source||"","text",'maxlength="80"')+field(t("reason"),"reason",item.reason||"","text",'maxlength="120"'),async data=>{
+        const incomeKind=data.get("kind");await persistRecord("incomes",{...item,id:item.id||newId(),kind:incomeKind,amount:Number(data.get("amount")),date:data.get("date"),month:data.get("month"),source:incomeKind==="other"?data.get("source").trim():"",reason:incomeKind==="other"?data.get("reason").trim():""});
+      });
+      const toggle=()=>{const other=root.querySelector('[name="kind"]').value==="other";for(const name of ["source","reason"]){const input=root.querySelector(`[name="${name}"]`);input.parentElement.classList.toggle("hidden",!other);input.required=other;}const month=root.querySelector('[name="month"]');month.parentElement.classList.toggle("hidden",other);month.required=!other;};
+      root.querySelector('[name="kind"]').addEventListener("change",toggle);toggle();
+    }
+    async function createCategoryPrompt() {
+      const name=prompt(t("categoryNamePrompt"));if(!name||!name.trim())return "";
+      const cleanName=name.trim().slice(0,30);if(allCategories().some(item=>item.name.toLowerCase()===cleanName.toLowerCase())){showToast(t("duplicateCategory"),true);return "";}
+      const color=prompt(t("colorPrompt"),"#7c6de0")||"#7c6de0";
+      const icon=prompt(t("iconPrompt"),"✨")||"✨";
+      const record={id:newId(),name:cleanName,color:/^#[0-9a-f]{6}$/i.test(color)?color:"#7c6de0",icon:icon.slice(0,8)};
+      await persistRecord("categories",record);return record.name;
+    }
+    function showExpenseDetail(item) {
+      const cat=categoryInfo(item.category);const root=openModal(t("expenseDetails"),`<div class="field full"><div class="detail-amount">${money(item.amount)}</div><div class="subtle">${escapeHtml(item.title)}</div></div><div class="detail-grid field full"><div class="detail-cell"><span>${escapeHtml(t("categoryField"))}</span><strong>${escapeHtml(cat.icon)} ${escapeHtml(categoryLabel(item.category))}</strong></div><div class="detail-cell"><span>${escapeHtml(t("dateTime"))}</span><strong>${escapeHtml(fmtDate(item.date))} ${escapeHtml(fmtTime(item.time,item.date))}</strong></div><div class="detail-cell"><span>${escapeHtml(t("paymentMethodField"))}</span><strong>${escapeHtml(paymentLabel(item.paymentMethod)||"—")}</strong></div><div class="detail-cell"><span>${escapeHtml(t("noteField"))}</span><strong>${escapeHtml(item.note||"—")}</strong></div></div>`,async()=>{});root.querySelector("form").remove();
+      const footer=document.createElement("div");footer.className="modal-footer";footer.innerHTML=`<button class="cancel-btn">${escapeHtml(t("close"))}</button><button class="primary-btn">${escapeHtml(t("editExpense"))}</button>`;root.querySelector(".modal").append(footer);footer.querySelector(".cancel-btn").onclick=()=>root.closeModal();footer.querySelector(".primary-btn").onclick=()=>{root.closeModal();window.setTimeout(()=>openExpenseForm(item),200);};
+    }
+    function showPage(page) {
+      activePage=page;$("dashboardView").classList.toggle("page-hidden",page!=="dashboard");$("historyView").classList.toggle("page-hidden",page!=="history");
+      $("historyButton").textContent=page==="dashboard"?t("history"):t("dashboard");
+      const view=page==="dashboard"?$("dashboardView"):$("historyView");view.classList.remove("page-view-enter");void view.offsetWidth;view.classList.add("page-view-enter");window.setTimeout(()=>view.classList.remove("page-view-enter"),300);
+      document.querySelectorAll(".bottom-nav [data-page]").forEach(button=>button.classList.toggle("active",button.dataset.page===page));if(page==="history")renderHistory();window.scrollTo({top:0,behavior:prefersReducedMotion()?"auto":"smooth"});
+    }
+    $("themeToggle").addEventListener("click",()=>{const dark=document.documentElement.dataset.theme!=="dark";document.documentElement.dataset.theme=dark?"dark":"light";$("themeToggle").textContent=dark?"☀":"☾";try{localStorage.setItem("ledgerly:theme",dark?"dark":"light");}catch(error){console.error("Could not save theme preference.",error);}drawCharts();});
+    try{if(localStorage.getItem("ledgerly:theme")==="dark"){document.documentElement.dataset.theme="dark";$("themeToggle").textContent="☀";}}catch(error){console.error("Could not read theme preference.",error);}
+    $("addPlanButton").onclick=()=>openPlanForm();$("addExpenseButton").onclick=()=>openExpenseForm();$("addIncomeButton").onclick=()=>openIncomeForm();
+    $("planCategoryFilter").onchange=()=>animateContent($("planningList"),renderPlans);$("planMonthFilter").onchange=()=>animateContent($("planningList"),renderPlans);$("planYearFilter").onchange=()=>animateContent($("planningList"),renderPlans);
+    $("expenseDateFilter").onchange=()=>animateContent($("expenseList"),renderExpenses);$("expenseCategoryFilter").onchange=()=>animateContent($("expenseList"),renderExpenses);$("expenseSearch").oninput=()=>animateContent($("expenseList"),renderExpenses);
+    $("expenseViewToggle").addEventListener("click",event=>{const button=event.target.closest("button[data-view]");if(!button)return;activeExpenseView=button.dataset.view;$("expenseViewToggle").querySelectorAll("button").forEach(item=>item.classList.toggle("active",item===button));animateContent($("expenseList"),renderExpenses);});
+    $("showAllExpenses").onclick=()=>{showPage("history");$("historyType").value="expense";renderHistory();};
+    $("historyButton").onclick=()=>showPage(activePage==="dashboard"?"history":"dashboard");
+    $("historyType").onchange=()=>animateContent($("historyList"),renderHistory);$("historyYear").onchange=()=>animateContent($("historyList"),renderHistory);$("historySearch").oninput=()=>animateContent($("historyList"),renderHistory);
+    $("exportBackupButton").addEventListener("click",exportBackup);
+    $("importBackupButton").addEventListener("click",()=>$("backupFileInput").click());
+    $("backupFileInput").addEventListener("change",async event=>{const input=event.currentTarget,file=input.files?.[0];if(!file)return;try{await importBackup(file);}finally{input.value="";}});
+    $("bottomNav").addEventListener("click",event=>{const page=event.target.closest("[data-page]");if(page)showPage(page.dataset.page);});
+    $("mobileAddButton").onclick=()=>openExpenseForm();
+    document.addEventListener("click",event=>{
+      const button=event.target.closest("button");
+      if(button&&!prefersReducedMotion()){
+        button.classList.add("has-ripple");
+        const rect=button.getBoundingClientRect(),size=Math.ceil(Math.hypot(rect.width,rect.height)*2),x=event.detail?event.clientX-rect.left:rect.width/2,y=event.detail?event.clientY-rect.top:rect.height/2;
+        const wave=document.createElement("span");wave.className="ripple-wave";wave.setAttribute("aria-hidden","true");wave.style.width=`${size}px`;wave.style.height=`${size}px`;wave.style.left=`${x-size/2}px`;wave.style.top=`${y-size/2}px`;
+        button.append(wave);wave.addEventListener("animationend",()=>wave.remove(),{once:true});
+      }
+      const edit=event.target.closest("[data-edit]");if(edit){const type=edit.dataset.edit,item=state[type].find(record=>record.id===edit.dataset.id);if(!item)return;if(type==="plannings")openPlanForm(item);else if(type==="expenses")openExpenseForm(item);else openIncomeForm(item);return;}
+      const remove=event.target.closest("[data-delete]");if(remove){const type=remove.dataset.delete,id=remove.dataset.id;if(confirm(t("deleteConfirm")))removeRecord(type,id,remove);return;}
+      const detail=event.target.closest("[data-detail]");if(detail){const item=state.expenses.find(record=>record.id===detail.dataset.detail);if(item)showExpenseDetail(item);}
+    });
+    window.addEventListener("beforeunload",event=>{
+      if(pendingSaves||hasUnsavedChanges||hasUnsubmittedChanges){event.preventDefault();event.returnValue=t("unsavedWarning");return event.returnValue;}
+    });
+    if("serviceWorker" in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("./service-worker.js").catch(error=>console.error("Service worker registration failed.",error));
+    setupLanguageSelector();
+    initializeData();
+  </script>
+</body>
+</html>
