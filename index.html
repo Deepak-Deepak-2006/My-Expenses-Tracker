@@ -889,7 +889,7 @@
     <form id="pinLockForm" style="box-sizing:border-box;display:grid;gap:14px;width:min(360px,100%);padding:30px;background:#fff;color:#202331;border-radius:16px;box-shadow:0 20px 60px #0006">
       <h1 style="margin:0;text-align:center;font-size:24px">My Expenses</h1>
       <label for="pinLockInput" style="font-size:14px;font-weight:600">PIN</label>
-      <input id="pinLockInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="PIN" style="box-sizing:border-box;width:100%;height:44px;padding:10px 12px;border:1px solid #d5d7df;border-radius:9px;color:#202331">
+      <input id="pinLockInput" type="password" maxlength="20" autocomplete="off" aria-label="PIN" style="box-sizing:border-box;width:100%;height:44px;padding:10px 12px;border:1px solid #d5d7df;border-radius:9px;color:#202331">
       <button type="submit" style="height:44px;border:0;border-radius:9px;background:#6658d3;color:#fff;font-weight:700">Unlock</button>
       <p id="pinLockError" role="alert" aria-live="polite" style="min-height:18px;margin:0;text-align:center;color:#c62828;font-size:14px"></p>
     </form>
@@ -913,8 +913,8 @@
       input.addEventListener("input", () => { error.textContent = ""; });
       form.addEventListener("submit", event => {
         event.preventDefault();
-        if (input.value !== "3337258") {
-          error.textContent = "Wrong PIN da!";
+        if (input.value !== "Ds@0602$") {
+          error.textContent = "Wrong PIN !";
           input.value = "";
           input.focus();
           return;
