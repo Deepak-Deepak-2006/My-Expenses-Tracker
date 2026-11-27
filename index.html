@@ -98,14 +98,6 @@
       .language-select{max-width:100px}
       .save-status{width:auto;min-width:100px}
     }
-    @media(max-width:420px){
-      .panel-heading{flex-wrap:wrap;align-items:flex-start}
-      .panel-heading>div{min-width:0}
-      #expenseViewToggle{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
-      #expenseViewToggle button{min-width:0;padding:7px 3px;overflow-wrap:anywhere;line-height:1.25}
-      .backup-actions{flex-wrap:wrap}
-      .backup-actions .text-btn,.backup-actions .small-btn{white-space:normal}
-    }
   </style>
 </head>
 <body>
@@ -892,6 +884,51 @@
     if("serviceWorker" in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("./service-worker.js").catch(error=>console.error("Service worker registration failed.",error));
     setupLanguageSelector();
     initializeData();
+  </script>
+  <div id="pinLock" style="position:fixed;inset:0;z-index:99999;display:grid;place-items:center;padding:20px;background:#111;color:#fff;font-family:Arial,Helvetica,sans-serif">
+    <form id="pinLockForm" style="box-sizing:border-box;display:grid;gap:14px;width:min(360px,100%);padding:30px;background:#fff;color:#202331;border-radius:16px;box-shadow:0 20px 60px #0006">
+      <h1 style="margin:0;text-align:center;font-size:24px">My Expenses</h1>
+      <label for="pinLockInput" style="font-size:14px;font-weight:600">PIN</label>
+      <input id="pinLockInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="PIN" style="box-sizing:border-box;width:100%;height:44px;padding:10px 12px;border:1px solid #d5d7df;border-radius:9px;color:#202331">
+      <button type="submit" style="height:44px;border:0;border-radius:9px;background:#6658d3;color:#fff;font-weight:700">Unlock</button>
+      <p id="pinLockError" role="alert" aria-live="polite" style="min-height:18px;margin:0;text-align:center;color:#c62828;font-size:14px"></p>
+    </form>
+  </div>
+  <script>
+    (() => {
+      const storageKey = "myExpensesPinLock";
+      const lock = document.getElementById("pinLock");
+      const form = document.getElementById("pinLockForm");
+      const input = document.getElementById("pinLockInput");
+      const error = document.getElementById("pinLockError");
+      try {
+        if (localStorage.getItem(storageKey) === "unlocked") {
+          lock.remove();
+          return;
+        }
+      } catch (storageError) {
+        console.error("Could not read the PIN lock state.", storageError);
+      }
+      input.focus();
+      input.addEventListener("input", () => { error.textContent = ""; });
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        if (input.value !== "3337258") {
+          error.textContent = "Wrong PIN da!";
+          input.value = "";
+          input.focus();
+          return;
+        }
+        try {
+          localStorage.setItem(storageKey, "unlocked");
+        } catch (storageError) {
+          console.error("Could not save the PIN lock state.", storageError);
+          error.textContent = "Could not save unlock on this device.";
+          return;
+        }
+        lock.remove();
+      });
+    })();
   </script>
 </body>
 </html>
